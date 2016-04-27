@@ -10,9 +10,13 @@ namespace HomeExam.States
 		private State curState;
 		private Queue<State> stateQueue = new Queue<State>();
 		private readonly StateManager states;
+		private readonly Trotor14_MechaGodzilla robot;
+		private string name = "State Machine";
 
-		public FiniteStateMachine(Trotor14_MechaGodzilla robot)
+		public FiniteStateMachine(string name, Trotor14_MechaGodzilla robot)
 		{
+			this.name = name;
+			this.robot = robot;
 			states = new StateManager(robot);
 
 			// Start in the idle state
@@ -61,9 +65,12 @@ namespace HomeExam.States
 		/// </summary>
 		private void SetCurrentState(State newState)
 		{
+			string transitionText = name + ": ";
+
 			if (curState != null)
 			{
 				curState.OnExit();
+				transitionText += curState.Id + " -> ";
 			}
 
 			curState = newState;
@@ -71,7 +78,10 @@ namespace HomeExam.States
 			if (curState != null)
 			{
 				curState.OnEnter();
+				transitionText += curState.Id;
 			}
+
+			robot.Out.WriteLine(transitionText);
 		}
 	}
 }

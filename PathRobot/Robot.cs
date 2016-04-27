@@ -40,7 +40,7 @@ namespace PG4500_2016_Exam2
 		public override void Run()
 		{
 			InitializeBot();
-			radarFSM.EnqueueState(StateManager.StateIdle);
+			radarFSM.EnqueueState(StateManager.StateRadarSweep);
 			driverFSM.EnqueueState(StateManager.StateIdle);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
 
@@ -49,19 +49,21 @@ namespace PG4500_2016_Exam2
 				UpdateBot();
 
 				// Debugging
-				Drawing.DrawString(Color.Black, "Driver    : " + driverFSM.CurrentStateID, new Vector2D(0, -20));
+				Drawing.DrawString(Color.Black, "Driver          : " + driverFSM.CurrentStateID, new Vector2D(0, -20));
 				Drawing.DrawString(Color.Black, "Commander : " + commanderFSM.CurrentStateID, new Vector2D(0, -50));
-				Drawing.DrawString(Color.Black, "Radar     : " + radarFSM.CurrentStateID, new Vector2D(0, -80));
+				Drawing.DrawString(Color.Black, "Radar           : " + radarFSM.CurrentStateID, new Vector2D(0, -80));
+				Drawing.DrawBox(Color.Red, enemyData.Position, 127);
 
+				Scan();
 				Execute();
 			}
 		}
 
 		private void InitializeBot()
 		{
-			radarFSM = new FiniteStateMachine(this);
-			driverFSM = new FiniteStateMachine(this);
-			commanderFSM = new FiniteStateMachine(this);
+			radarFSM = new FiniteStateMachine("Radar", this);
+			driverFSM = new FiniteStateMachine("Driver", this);
+			commanderFSM = new FiniteStateMachine("Commander", this);
 			Position = new Vector2D();
 			Drawing = new Drawing(this);
 			enemyData = new EnemyData(this);
@@ -80,6 +82,12 @@ namespace PG4500_2016_Exam2
 			driverFSM.Update();
 			commanderFSM.Update();
 			Position.Set(X, Y);
+		}
+
+		public override void OnScannedRobot(ScannedRobotEvent evnt)
+		{
+			enemyData.SetData(evnt);
+			radarFSM.EnqueueState(StateManager.StateRadarLock);
 		}
 	}
 }

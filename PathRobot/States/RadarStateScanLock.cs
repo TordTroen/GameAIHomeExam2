@@ -12,7 +12,7 @@ namespace HomeExam.States
 	/// </summary>
 	public class RadarStateScanLock : State
 	{
-		private const double LockValue = 2;
+		private const double LockValue = 1;
 
 		public override void OnEnter()
 		{

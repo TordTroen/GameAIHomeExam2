@@ -15,7 +15,7 @@ namespace HomeExam.States
 	public class StateManager
 	{
 		public const string StateIdle = "Idle";
-		public const string StateScanLock = "ScanLock";
+		public const string StateRadarLock = "ScanLock";
 		public const string StateRadarSweep = "RadarSweep";
 
 		private readonly Dictionary<string, State> states;
@@ -29,7 +29,8 @@ namespace HomeExam.States
 			states = new Dictionary<string, State>
 			{
 				{ StateIdle, new StateIdle() },
-				{ StateScanLock, new RadarStateScanLock() }
+				{ StateRadarSweep, new RadarStateScanSweep() },
+				{ StateRadarLock, new RadarStateScanLock() }
 			};
 			// Initialize the states with the dictionary entry's key and a reference to the robot
 			foreach (var item in states)

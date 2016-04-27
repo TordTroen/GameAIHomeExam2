@@ -13,16 +13,11 @@ namespace HomeExam
 		public double Heading { get; set; }
 		public double Distance { get; set; }
 		public double Velocity { get; set; }
-		public double Energy { get; set; }
-		public double OldEnergy { get; set; }
 		public long UpdateTime { get; set; } // The time we last set this data
 		public Vector2D Position { get; set; }
 		public Vector2D LastPosition { get; set; }
 
 		private readonly Trotor14_MechaGodzilla robot;
-		/// <summary>
-		/// Returns the amount of time the data is valid based on if we hit more than we miss.
-		/// </summary>
 		public const long ValidDataTime = 10;
 
 		public EnemyData(Trotor14_MechaGodzilla robot)
@@ -40,7 +35,6 @@ namespace HomeExam
 
 		public void SetData(ScannedRobotEvent scanEvnt)
 		{
-			OldEnergy = Energy;
 			LastPosition.Set(Position);
 
 			if (scanEvnt != null)
@@ -51,7 +45,6 @@ namespace HomeExam
 				Distance = scanEvnt.Distance;
 				Velocity = scanEvnt.Velocity;
 				UpdateTime = scanEvnt.Time;
-				Energy = scanEvnt.Energy;
 
 				if (robot != null)
 				{
@@ -83,26 +76,6 @@ namespace HomeExam
 			long deltaTime = robot.Time - UpdateTime;
 			return (deltaTime < ValidDataTime);
 		}
-
-		public DistanceLevel GetDistanceLevel()
-		{
-			if (Distance > Trotor14_MechaGodzilla.PrefferedEnemyDistance * 1.5)
-			{
-				return DistanceLevel.TooFar;
-			}
-			else if (Distance < Trotor14_MechaGodzilla.PrefferedEnemyDistance * 0.5)
-			{
-				return DistanceLevel.TooClose;
-			}
-			return DistanceLevel.Preffered;
-		}
-	}
-
-	public enum DistanceLevel
-	{
-		TooFar,
-		Preffered,
-		TooClose
 	}
 }
          
