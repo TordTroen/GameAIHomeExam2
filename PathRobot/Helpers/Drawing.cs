@@ -7,6 +7,7 @@ using System.Drawing;
 using HomeExam.Helpers;
 using Robocode.Util;
 using PG4500_2016_Exam2;
+using Robocode;
 
 namespace HomeExam
 {
@@ -48,6 +49,19 @@ namespace HomeExam
 			Color col = Color.FromArgb(alpha, color);
 			robot.Graphics.DrawEllipse(new Pen(col, stroke), (float)pos.X - width / 2, 
 										(float)pos.Y - height / 2, width, height);
+		}
+	}
+
+	public static class DrawingExtensions
+	{
+		public static void DrawBox(this IGraphics graphics, Color color, Vector2D pos, int alpha = 255,
+			float width = 50f, float height = 50f)
+		{
+			Color col = Color.FromArgb(alpha, color);
+			graphics.FillRectangle(new SolidBrush(col),
+				(int)(pos.X - (width / 2)),
+				(int)(pos.Y - (height / 2)),
+				width, height);
 		}
 	}
 }

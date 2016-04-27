@@ -9,12 +9,15 @@ namespace HomeExam
 {
 	public class MapNode
 	{
+		public int ID { get; private set; }
 		public int X { get; private set; }
 		public int Y { get; private set; }
 		public bool IsObstacle { get; private set; }
+		public List<MapNode> Neighbours { get; set; }
 
-		public MapNode(int x, int y, bool isObstacle)
+		public MapNode(int id, int x, int y, bool isObstacle)
 		{
+			ID = id;
 			X = x;
 			Y = y;
 			IsObstacle = isObstacle;
