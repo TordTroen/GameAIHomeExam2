@@ -97,10 +97,12 @@ namespace PG4500_2016_Exam2
 		public override void OnPaint(IGraphics graphics)
 		{
 			MapNode node = collisionMap.GetNode(new Vector2D(25, 25));
-			node = collisionMap.GetNode(-7, 17);
+			node = collisionMap.GetNode(enemyData.Position);
+			Out.WriteLine("Paint");
+			//node = collisionMap.GetNode(-7, 17);
 			if (node != null)
 			{
-				graphics.DrawBox(Color.Red, node.GetPhysicalPosition(), 127);
+				graphics.DrawBox(Color.Yellow, node.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 			//collisionMap.PaintMap();
 		}
