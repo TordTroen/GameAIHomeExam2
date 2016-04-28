@@ -9,23 +9,43 @@ namespace HomeExam
 {
 	public class MapNode
 	{
-		public int ID { get; private set; }
 		public int X { get; private set; }
 		public int Y { get; private set; }
-		public bool IsObstacle { get; private set; }
 		public List<MapNode> Neighbours { get; set; }
 
-		public MapNode(int id, int x, int y, bool isObstacle)
+		public MapNode(int x, int y)
 		{
-			ID = id;
 			X = x;
 			Y = y;
-			IsObstacle = isObstacle;
 		}
 
 		public Vector2D GetPhysicalPosition()
 		{
-			return new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize);
+			return new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize/2, CollisionMap.NodeSize/2);
+		}
+
+		public static bool operator ==(MapNode a, MapNode b)
+		{
+			if (ReferenceEquals(a, b))
+			{
+				return true;
+			}
+			if (((object)a == null) || ((object)b == null))
+			{
+				return false;
+			}
+
+			return a.X == b.X && a.Y == b.Y;
+		}
+
+		public static bool operator !=(MapNode a, MapNode b)
+		{
+			return !(a == b);
+		}
+
+		public override string ToString()
+		{
+			return string.Format("[{0}, {1}]", X, Y);
 		}
 	}
 }

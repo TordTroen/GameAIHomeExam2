@@ -16,7 +16,7 @@ namespace HomeExam
 		public const int Width = 16;
 		public const int Height = 12;
 
-		public List<MapNode> map;
+		public List<MapNode> map = new List<MapNode>();
 		private int[] simpleMap = new int[] 
 		{
 			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -52,24 +52,63 @@ namespace HomeExam
 			//map = new MapNode[simpleMap.Length];
 			//robot.Out.WriteLine("Lenght: " + simpleMap.Length);
 			int x = 0;
-			int y = 0;
+			int y = Height-1;
 			for (int i = 0; i < simpleMap.Length; i ++)
 			{
-				int mod = (i + 1) % Width;
-				if (mod == 0)
+				//int mod = (i + 1) % Width;
+				//if (mod == 0)
+				if (x >= Width)
 				{
-					y++;
+					y--;
+					x = 0;
 				}
-				map.Add(new MapNode(i, x, y, simpleMap[i] == 1));
+				if (simpleMap[i] == 0)
+				{
+					map.Add(new MapNode(x, y));
+				}
 				//robot.Out.WriteLine(string.Format("[{0}, {1}]: {2}", x, y, simpleMap[i] == 1));
 				//robot.Out.WriteLine(string.Format("[{0}, {1}]: {2} % {3} = {4}", x, y, i+1, Width, mod));
 				x++;
 			}
 
+			//foreach (var node in map)
+			//{
+			//	node.Neighbours = GetNeighbours(node);
+			//}
+			//PaintMap();
+		}
+
+		public MapNode GetNode(Vector2D pos)
+		{
+			//if (map == null) return null;
+
+			MapNode n = null;
+			int x = (int)(pos.X / NodeSize);
+			int y = (int)(pos.Y / NodeSize);
+			n = GetNode(x, y);
+			return n;
+		}
+
+		public MapNode GetNode(int x, int y)
+		{
+			MapNode n = null;
+			MapNode comp = new MapNode(x, y);
 			foreach (var node in map)
 			{
-				node.Neighbours = GetNeighbours(node);
+				if (node == comp)
+				{
+					n = node;
+					break;
+				}
 			}
+
+			if (n == null)
+			{
+				// TODO look in the map of obstacles
+				robot.Out.WriteLine("Couldn't find node: " + comp);
+			}
+
+			return n;
 		}
 
 		private List<MapNode> GetNeighbours(MapNode node)
@@ -87,14 +126,12 @@ namespace HomeExam
 			return neighbours;
 		}
 
-		public void PaintMap(IGraphics graphics)
+		public void PaintMap()
 		{
 			foreach (var node in map)
 			{
-				//graphics.DrawBox(node.IsObstacle ? Color.Red : Color.Blue, node.GetPhysicalPosition(), 127, (float)NodeSize, (float)NodeSize);
 				Vector2D pos = node.GetPhysicalPosition();
-				Color col = node.IsObstacle ? Color.Red : Color.Blue;
-				graphics.FillRectangle(new SolidBrush(col), (int)(pos.X - (NodeSize / 2)), (int)(pos.Y - (NodeSize / 2)), (float)NodeSize, (float)NodeSize);
+				robot.Drawing.DrawBox(Color.Yellow, pos, 127);
 			}
 		}
 	}
