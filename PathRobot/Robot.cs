@@ -42,7 +42,7 @@ namespace PG4500_2016_Exam2
 		public override void Run()
 		{
 			InitializeBot();
-			TargetNode = collisionMap.GetNode(new Vector2D(25, 25));
+			TargetNode = collisionMap.GetNode(new Vector2D(25, 25), false);
 			radarFSM.EnqueueState(StateManager.StateRadarSweep);
 			driverFSM.EnqueueState(StateManager.StateChaseTarget);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
@@ -57,7 +57,7 @@ namespace PG4500_2016_Exam2
 				Drawing.DrawString(Color.Black, "Commander : " + commanderFSM.CurrentStateID, new Vector2D(0, -50));
 				Drawing.DrawString(Color.Black, "Radar           : " + radarFSM.CurrentStateID, new Vector2D(0, -80));
 				//Drawing.DrawBox(Color.Red, enemyData.Position, 127);
-				TargetNode = collisionMap.GetNode(enemyData.Position);
+				TargetNode = collisionMap.GetNode(enemyData.Position, true);
 
 				Scan();
 				Execute();
@@ -99,14 +99,17 @@ namespace PG4500_2016_Exam2
 
 		public override void OnPaint(IGraphics graphics)
 		{
-			//MapNode node = collisionMap.GetNode(new Vector2D(25, 25));
-			//node = collisionMap.GetNode(enemyData.Position);
-			//node = collisionMap.GetNode(-7, 17);
+			//MapNode topLeft = collisionMap.GetNode(0, 0);
+			//graphics.DrawBox(Color.Green, topLeft.GetPhysicalPosition(), 127);
+
 			if (TargetNode != null)
 			{
-				graphics.DrawBox(Color.Yellow, TargetNode.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				graphics.DrawBox(Color.Red, TargetNode.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				foreach (var node in TargetNode.Neighbours)
+				{
+					graphics.DrawBox(Color.Orange, node.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				}
 			}
-			//collisionMap.PaintMap();
 		}
 	}
 }

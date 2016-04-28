@@ -12,13 +12,15 @@ namespace HomeExam
 {
 	public class CollisionMap
 	{
-		public const double NodeSize = 50;
-		public const int Width = 16;
-		public const int Height = 12;
+		public const double NodeSize = 50; // The size of each node or cell
+		public const int Width = 16; // Number of nodes across
+		public const int Height = 12; // Number of nodes down
 
-		public List<MapNode> map = new List<MapNode>();
-		public List<MapNode> obstacles = new List<MapNode>();
-		private int[] simpleMap = new int[] 
+		public List<MapNode> map = new List<MapNode>(); // The nodes we can move through
+		public List<MapNode> obstacles = new List<MapNode>(); // The nodes we can't move through
+
+		// The collision map we have been provided
+		private readonly int[] simpleMap =
 		{
 			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0,
@@ -33,12 +35,18 @@ namespace HomeExam
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		};
-		private MapNode[] PossibleNeighbours = new MapNode[]
+
+		// List of "direction" we look for neighbours in
+		private readonly MapNode[] PossibleNeighbours = 
 		{
-			new MapNode(1, 0),
-			new MapNode(-1, 0),
-			new MapNode(0, 1),
-			new MapNode(0, -1)
+			new MapNode(1, 0),		// Right
+			new MapNode(-1, 0),		// Left
+			new MapNode(0, 1),		// Up
+			new MapNode(0, -1),		// Down
+			new MapNode(-1, -1),	// Down-left
+			new MapNode(1, 1),		// Up-right
+			new MapNode(-1, 1),		// Up-left
+			new MapNode(1, -1)		// Down-right
 		};
 		private readonly Trotor14_MechaGodzilla robot;
 
@@ -50,22 +58,22 @@ namespace HomeExam
 
 		private void InitializeMap()
 		{
-			//map = new MapNode[simpleMap.Length];
-			//robot.Out.WriteLine("Lenght: " + simpleMap.Length);
 			int x = 0;
 			int y = Height-1;
 			for (int i = 0; i < simpleMap.Length; i ++)
 			{
-				//int mod = (i + 1) % Width;
-				//if (mod == 0)
+				// If we have reached the end of the row, go to the next row
 				if (x >= Width)
 				{
 					y--;
 					x = 0;
 				}
+
+				// Create a new node with the current x and y
 				MapNode node = new MapNode(x, y);
 				if (node.IsInsideMapBounds())
 				{
+					// Add the node to the map or the obstacles list based on what the simplemap value is
 					if (simpleMap[i] == 0)
 					{
 						map.Add(node);
@@ -76,28 +84,32 @@ namespace HomeExam
 					}
 				}
 				
-				//robot.Out.WriteLine(string.Format("[{0}, {1}]: {2}", x, y, simpleMap[i] == 1));
-				//robot.Out.WriteLine(string.Format("[{0}, {1}]: {2} % {3} = {4}", x, y, i+1, Width, mod));
 				x++;
 			}
 
-			//foreach (var node in map)
-			//{
-			//	node.Neighbours = GetNeighbours(node);
-			//}
-			//PaintMap();
+			// Find and store the neighbours of all the nodes in both the map and obstacles list
+			foreach (var node in map)
+			{
+				node.Neighbours = GetNeighbours(node);
+			}
+			foreach (var node in obstacles)
+			{
+				node.Neighbours = GetNeighbours(node);
+			}
 		}
 
-		public MapNode GetNode(Vector2D pos)
+		public MapNode GetNode(Vector2D pos, bool includeObstacles)
 		{
-			//if (map == null) return null;
-
+			// Calculate the x and y based on the position given
 			int x = (int)(pos.X / NodeSize);
 			int y = (int)(pos.Y / NodeSize);
-			return GetNode(x, y);
+			return GetNode(x, y, includeObstacles);
 		}
 
-		public MapNode GetNode(int x, int y)
+		/// <summary>
+		/// Returns a MapNode given an x and y. Returns null if there is no node found with the given x and y.
+		/// </summary>
+		public MapNode GetNode(int x, int y, bool includeObstacles)
 		{
 			MapNode n = null;
 			MapNode comp = new MapNode(x, y);
@@ -116,7 +128,7 @@ namespace HomeExam
 				}
 
 				// If we couldn't find a node in the map, look for it in the obstacles
-				if (n == null)
+				if (n == null && includeObstacles)
 				{
 					// Try to find a matching node in the list of obstacles
 					foreach (var node in obstacles)
@@ -129,31 +141,26 @@ namespace HomeExam
 					}
 				}
 			}
-			else
-			{
-				robot.Out.WriteLine("Node: " + comp + " is outside map bounds");
-			}
-
-			if (n == null)
-			{
-				robot.Out.WriteLine("Couldn't find node: " + comp);
-			}
 
 			return n;
 		}
 
 		private List<MapNode> GetNeighbours(MapNode node)
 		{
+			//robot.Out.Write("Neighbours of " + node + ":");
 			var neighbours = new List<MapNode>();
 			foreach (var direction in PossibleNeighbours)
 			{
-				Predicate<MapNode> nodeFinder = (MapNode n) => n.X == node.X + direction.X && n.Y == node.Y + direction.Y;
-				MapNode neighbour = map.Find(nodeFinder);
+				//Predicate<MapNode> nodeFinder = (MapNode n) => n.X == node.X + direction.X && n.Y == node.Y + direction.Y;
+				MapNode neighbour;// = map.Find(nodeFinder);
+				neighbour = GetNode(node.X + direction.X, node.Y + direction.Y, false);
 				if (neighbour != null)
 				{
 					neighbours.Add(neighbour);
+					//robot.Out.Write(", " + neighbour);
 				}
 			}
+			//robot.Out.WriteLine();
 			return neighbours;
 		}
 

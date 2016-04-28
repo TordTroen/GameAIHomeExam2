@@ -15,6 +15,7 @@ namespace HomeExam
 
 		public MapNode(int x, int y)
 		{
+			Neighbours = new List<MapNode>();
 			X = x;
 			Y = y;
 		}
