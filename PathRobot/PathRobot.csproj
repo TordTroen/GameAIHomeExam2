@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AStarSearch.cs" />
     <Compile Include="CollisionMap.cs" />
     <Compile Include="Data\EnemyData.cs" />
     <Compile Include="Helpers\Drawing.cs" />

@@ -30,6 +30,16 @@ namespace HomeExam
 			return new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize/2, CollisionMap.NodeSize/2);
 		}
 
+		public override bool Equals(object obj)
+		{
+			return this == (MapNode)obj;
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
 		public static bool operator ==(MapNode a, MapNode b)
 		{
 			if (ReferenceEquals(a, b))
