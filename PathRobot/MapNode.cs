@@ -19,6 +19,11 @@ namespace HomeExam
 			Y = y;
 		}
 
+		public bool IsInsideMapBounds()
+		{
+			return X >= 0 && X < CollisionMap.Width && Y >= 0 && Y < CollisionMap.Height;
+		}
+
 		public Vector2D GetPhysicalPosition()
 		{
 			return new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize/2, CollisionMap.NodeSize/2);
