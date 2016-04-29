@@ -62,6 +62,7 @@
     <Compile Include="States\StateManager.cs" />
     <Compile Include="SteeringBehavior\ArrivalBehavior.cs" />
     <Compile Include="SteeringBehavior\FleeBehavor.cs" />
+    <Compile Include="SteeringBehavior\SeekBehaviour.cs" />
     <Compile Include="SteeringBehavior\Steeringbehaviour.cs" />
     <Compile Include="SteeringBehavior\WanderBehavior.cs" />
   </ItemGroup>

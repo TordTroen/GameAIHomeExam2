@@ -8,5 +8,6 @@ namespace HomeExam
 {
 	public class AStarSearch
 	{
+
 	}
 }

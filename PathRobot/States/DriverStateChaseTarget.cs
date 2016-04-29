@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HomeExam.SteeringBehavior;
 
 namespace HomeExam.States
 {
 	public class DriverStateChaseTarget : State
 	{
-		private ArrivalBehavior arrival;
+		private SeekBehaviour seek;
 
 		public override void OnStart()
 		{
-			arrival = new ArrivalBehavior(robot, 150);
+			seek = new SeekBehaviour(robot);
 		}
 
 
@@ -20,7 +21,7 @@ namespace HomeExam.States
 		{
 			string ret = base.OnUpdate();
 
-			arrival.Steer(robot.TargetNode.GetPhysicalPosition());
+			seek.Steer(robot.TargetNode.GetPhysicalPosition());
 
 			return ret;
 		}

@@ -4,22 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HomeExam.Helpers;
-using Robocode.Util;
 using PG4500_2016_Exam2;
 
 namespace HomeExam.SteeringBehavior
 {
-	public class FleeBehavior : SteeringBehaviour
+	public class SeekBehaviour : SteeringBehaviour
 	{
-		public FleeBehavior(Trotor14_MechaGodzilla robot)
+		public SeekBehaviour(Trotor14_MechaGodzilla robot)
 			: base(robot)
 		{
-			
 		}
 
 		public override void Steer(Vector2D targetPos)
 		{
-			Vector2D desiredVelocity = Vector2D.Normalize(robot.Position - targetPos) * Trotor14_MechaGodzilla.MaxSpeed;
+			Vector2D curPos = robot.Position;
+
+			Vector2D desiredVelocity = (Vector2D.Normalize(targetPos - curPos) * Trotor14_MechaGodzilla.MaxSpeed);
+
 			ApplySteering(desiredVelocity, robot.VelocityVector);
 		}
 	}

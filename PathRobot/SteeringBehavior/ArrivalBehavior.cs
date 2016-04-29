@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeExam
+namespace HomeExam.SteeringBehavior
 {
 	public class ArrivalBehavior : SteeringBehaviour
 	{

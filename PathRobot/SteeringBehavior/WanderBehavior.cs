@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using HomeExam.Helpers;
 using Robocode.Util;
 
-namespace HomeExam
+namespace HomeExam.SteeringBehavior
 {
 	public class WanderBehavior : SteeringBehaviour
 	{
