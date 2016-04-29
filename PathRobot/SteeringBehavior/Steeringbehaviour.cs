@@ -11,9 +11,9 @@ namespace HomeExam.SteeringBehavior
 {
 	public class SteeringBehaviour
 	{
-		protected readonly Trotor14_MechaGodzilla robot;
+		protected readonly Trotor14MechaGodzilla robot;
 
-		public SteeringBehaviour(Trotor14_MechaGodzilla robot)
+		public SteeringBehaviour(Trotor14MechaGodzilla robot)
 		{
 			this.robot = robot;
 		}
@@ -29,11 +29,11 @@ namespace HomeExam.SteeringBehavior
 
 			Vector2D steering = desiredVelocity - velocity;
 
-			steering.Truncate(Trotor14_MechaGodzilla.MaxSpeed);
-			steering = steering / Trotor14_MechaGodzilla.Mass;
+			steering.Truncate(Trotor14MechaGodzilla.MaxSpeed);
+			steering = steering / Trotor14MechaGodzilla.Mass;
 
 			velocity = velocity + steering;
-			velocity.Truncate(Trotor14_MechaGodzilla.MaxSpeed);
+			velocity.Truncate(Trotor14MechaGodzilla.MaxSpeed);
 
 			Vector2D pos = curPos + velocity;
 

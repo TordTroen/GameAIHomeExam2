@@ -13,10 +13,10 @@ namespace HomeExam
 {
 	public class Drawing
 	{
-		private readonly Trotor14_MechaGodzilla robot;
+		private readonly Trotor14MechaGodzilla robot;
 		private Font font;
 
-		public Drawing(Trotor14_MechaGodzilla robot)
+		public Drawing(Trotor14MechaGodzilla robot)
 		{
 			this.robot = robot;
 			font = new Font("Monospace", 20);

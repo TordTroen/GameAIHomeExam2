@@ -5,9 +5,9 @@ namespace HomeExam.States
 	public class State
 	{
 		public string Id { get; private set; }
-		protected Trotor14_MechaGodzilla robot;
+		protected Trotor14MechaGodzilla robot;
 
-		public void Initialize(string id, Trotor14_MechaGodzilla robot)
+		public void Initialize(string id, Trotor14MechaGodzilla robot)
 		{
 			Id = id;
 			this.robot = robot;

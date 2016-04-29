@@ -10,10 +10,10 @@ namespace HomeExam.States
 		private State curState;
 		private Queue<State> stateQueue = new Queue<State>();
 		private readonly StateManager states;
-		private readonly Trotor14_MechaGodzilla robot;
+		private readonly Trotor14MechaGodzilla robot;
 		private string name = "State Machine";
 
-		public FiniteStateMachine(string name, Trotor14_MechaGodzilla robot)
+		public FiniteStateMachine(string name, Trotor14MechaGodzilla robot)
 		{
 			this.name = name;
 			this.robot = robot;

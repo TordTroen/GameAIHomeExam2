@@ -17,10 +17,10 @@ namespace HomeExam
 		public Vector2D Position { get; set; }
 		public Vector2D LastPosition { get; set; }
 
-		private readonly Trotor14_MechaGodzilla robot;
+		private readonly Trotor14MechaGodzilla robot;
 		public const long ValidDataTime = 10;
 
-		public EnemyData(Trotor14_MechaGodzilla robot)
+		public EnemyData(Trotor14MechaGodzilla robot)
 		{
 			this.robot = robot;
 			Position = new Vector2D();

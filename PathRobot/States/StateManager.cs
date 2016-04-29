@@ -20,9 +20,9 @@ namespace HomeExam.States
 		public const string StateChaseTarget = "ChaseTarget";
 
 		private readonly Dictionary<string, State> states;
-		private readonly Trotor14_MechaGodzilla robot;
+		private readonly Trotor14MechaGodzilla robot;
 
-		public StateManager(Trotor14_MechaGodzilla robot)
+		public StateManager(Trotor14MechaGodzilla robot)
 		{
 			this.robot = robot;
 

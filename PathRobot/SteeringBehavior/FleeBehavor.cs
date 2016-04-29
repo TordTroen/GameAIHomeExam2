@@ -11,7 +11,7 @@ namespace HomeExam.SteeringBehavior
 {
 	public class FleeBehavior : SteeringBehaviour
 	{
-		public FleeBehavior(Trotor14_MechaGodzilla robot)
+		public FleeBehavior(Trotor14MechaGodzilla robot)
 			: base(robot)
 		{
 			
@@ -19,7 +19,7 @@ namespace HomeExam.SteeringBehavior
 
 		public override void Steer(Vector2D targetPos)
 		{
-			Vector2D desiredVelocity = Vector2D.Normalize(robot.Position - targetPos) * Trotor14_MechaGodzilla.MaxSpeed;
+			Vector2D desiredVelocity = Vector2D.Normalize(robot.Position - targetPos) * Trotor14MechaGodzilla.MaxSpeed;
 			ApplySteering(desiredVelocity, robot.VelocityVector);
 		}
 	}

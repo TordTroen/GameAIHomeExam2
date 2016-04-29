@@ -13,7 +13,7 @@ namespace HomeExam.SteeringBehavior
 	{
 		private readonly double slowdownRadius = 100;
 
-		public ArrivalBehavior(Trotor14_MechaGodzilla robot, double slowdownRadius)
+		public ArrivalBehavior(Trotor14MechaGodzilla robot, double slowdownRadius)
 			: base(robot)
 		{
 			this.slowdownRadius = slowdownRadius;
@@ -30,7 +30,7 @@ namespace HomeExam.SteeringBehavior
 			{
 				slowdownFactor = dist / slowdownRadius;
 			}
-			Vector2D desiredVelocity = (Vector2D.Normalize(targetPos - curPos) * Trotor14_MechaGodzilla.MaxSpeed) * slowdownFactor;
+			Vector2D desiredVelocity = (Vector2D.Normalize(targetPos - curPos) * Trotor14MechaGodzilla.MaxSpeed) * slowdownFactor;
 
 			ApplySteering(desiredVelocity, robot.VelocityVector);
 		}

@@ -17,7 +17,7 @@ namespace HomeExam.SteeringBehavior
 		private double wanderVariance = 10.0;
 		private readonly Random rnd = new Random();
 
-		public WanderBehavior(Trotor14_MechaGodzilla robot)
+		public WanderBehavior(Trotor14MechaGodzilla robot)
 			: base(robot)
 		{
 

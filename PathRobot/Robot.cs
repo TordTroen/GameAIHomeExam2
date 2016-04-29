@@ -11,7 +11,7 @@ using System.Drawing;
 
 namespace PG4500_2016_Exam2
 {
-    public class Trotor14_MechaGodzilla : AdvancedRobot
+    public class Trotor14MechaGodzilla : AdvancedRobot
     {
 		public const double Mass = 2;
 		public const double MaxSpeed = 1;

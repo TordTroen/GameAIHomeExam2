@@ -10,7 +10,7 @@ namespace HomeExam.SteeringBehavior
 {
 	public class SeekBehaviour : SteeringBehaviour
 	{
-		public SeekBehaviour(Trotor14_MechaGodzilla robot)
+		public SeekBehaviour(Trotor14MechaGodzilla robot)
 			: base(robot)
 		{
 		}
@@ -19,7 +19,7 @@ namespace HomeExam.SteeringBehavior
 		{
 			Vector2D curPos = robot.Position;
 
-			Vector2D desiredVelocity = (Vector2D.Normalize(targetPos - curPos) * Trotor14_MechaGodzilla.MaxSpeed);
+			Vector2D desiredVelocity = (Vector2D.Normalize(targetPos - curPos) * Trotor14MechaGodzilla.MaxSpeed);
 
 			ApplySteering(desiredVelocity, robot.VelocityVector);
 		}

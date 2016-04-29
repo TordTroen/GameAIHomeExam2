@@ -48,9 +48,9 @@ namespace HomeExam
 			new MapNode(-1, 1),		// Up-left
 			new MapNode(1, -1)		// Down-right
 		};
-		private readonly Trotor14_MechaGodzilla robot;
+		private readonly Trotor14MechaGodzilla robot;
 
-		public CollisionMap(Trotor14_MechaGodzilla robot)
+		public CollisionMap(Trotor14MechaGodzilla robot)
 		{
 			this.robot = robot;
 			InitializeMap();
