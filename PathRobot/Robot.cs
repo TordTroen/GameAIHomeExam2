@@ -38,6 +38,10 @@ namespace PG4500_2016_Exam2
 		private FiniteStateMachine driverFSM;
 		private FiniteStateMachine commanderFSM;
 		private CollisionMap collisionMap;
+		private AStarSearch aStarSearch;
+		private MapNode startNode;
+		private MapNode goalNode;
+		private Queue<MapNode> nodePath;
 
 		public override void Run()
 		{
@@ -47,6 +51,11 @@ namespace PG4500_2016_Exam2
 			radarFSM.EnqueueState(StateManager.StateRadarSweep);
 			driverFSM.EnqueueState(StateManager.StateChaseTarget);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
+
+			startNode = collisionMap.GetNode(0, 0, false);
+			goalNode = collisionMap.GetNode(10, 10, false);
+
+			nodePath = aStarSearch.Search(startNode, goalNode);
 
 			while (true)
 			{
@@ -74,6 +83,7 @@ namespace PG4500_2016_Exam2
 			Drawing = new Drawing(this);
 			enemyData = new EnemyData(this);
 			collisionMap = new CollisionMap(this);
+			aStarSearch = new AStarSearch(collisionMap);
 
 			SetColors(Color.LightGray, Color.DimGray, Color.Gray, Color.Yellow, Color.Red);
 			IsAdjustRadarForGunTurn = false;
@@ -98,8 +108,29 @@ namespace PG4500_2016_Exam2
 			radarFSM.EnqueueState(StateManager.StateRadarLock);
 		}
 
+		public override void OnMouseClicked(MouseEvent e)
+		{
+			MapNode node = collisionMap.GetNode(new Vector2D(e.X, e.Y), true);
+			if (node != null)
+			{
+				goalNode = node;
+				nodePath = aStarSearch.Search(startNode, goalNode);
+			}
+		}
+
 		public override void OnPaint(IGraphics graphics)
 		{
+			graphics.DrawBox(Color.Blue, startNode.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+			graphics.DrawBox(Color.Green, goalNode.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+
+			if (nodePath != null)
+			{
+				foreach (var node in nodePath)
+				{
+					graphics.DrawBox(Color.White, node.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				}
+			}
+
 			// Paint the target
 			if (TargetNode != null)
 			{

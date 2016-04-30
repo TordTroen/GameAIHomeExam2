@@ -12,6 +12,8 @@ namespace HomeExam
 		public int X { get; private set; }
 		public int Y { get; private set; }
 		public List<MapNode> Neighbours { get; set; }
+		public MapNode CameFrom { get; set; }
+		public double Score { get; set; }
 
 		public MapNode(int x, int y)
 		{

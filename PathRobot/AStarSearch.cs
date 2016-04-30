@@ -8,28 +8,40 @@ namespace HomeExam
 {
 	public class AStarSearch
 	{
-		private readonly CollisionMap map;
+		private readonly CollisionMap collisionMap;
+		private List<MapNode> closedSet = new List<MapNode>();
+		private List<MapNode> openSet = new List<MapNode>();
+		private Dictionary<MapNode, double> gScore = new Dictionary<MapNode, double>();
+		private Dictionary<MapNode, double> fScore = new Dictionary<MapNode, double>();
+		private Dictionary<MapNode, MapNode> cameFrom = new Dictionary<MapNode, MapNode>();
 
 		public AStarSearch(CollisionMap map)
 		{
-			this.map = map;
-		}
+			collisionMap = map;
 
-		public MapNode Search(MapNode start, MapNode goal)
-		{
-			var closedSet = new List<MapNode>();
-			var openSet = new List<MapNode> { start };
-
-			var gScore = new Dictionary<MapNode, double>();
-			var fScore = new Dictionary<MapNode, double>();
-			foreach (var node in map.map)
+			gScore = new Dictionary<MapNode, double>();
+			fScore = new Dictionary<MapNode, double>();
+			foreach (var node in collisionMap.map)
 			{
+				if (gScore.ContainsKey(node) || fScore.ContainsKey(node))
+				{
+					continue;
+				}
 				gScore.Add(node, double.NegativeInfinity);
 				fScore.Add(node, double.NegativeInfinity);
 			}
+		}
+
+		public Queue<MapNode> Search(MapNode start, MapNode goal)
+		{
+			closedSet = new List<MapNode>();
+			openSet = new List<MapNode> { start };
+			ResetCollections();
 			gScore[start] = 0;
-			fScore[start] = HeuristicEstimate(start, goal);
+			start.Score = HeuristicEstimate(start, goal);
+			fScore[start] = start.Score;
 			MapNode current = null;
+			double tenativeScore = 0;
 
 			while (openSet.Count > 0)
 			{
@@ -38,6 +50,7 @@ namespace HomeExam
 				if (current == goal)
 				{
 					// TODO Return path from where we came to goal
+					return ReconstructPath(current);
 				}
 
 				openSet.Remove(current);
@@ -49,29 +62,70 @@ namespace HomeExam
 					{
 						continue;
 					}
-					// TODO tenative gscore
+					tenativeScore = gScore[current] + current.GetPhysicalPosition().Distance(neighbour.GetPhysicalPosition());
 					if (!openSet.Contains(neighbour))
 					{
 						openSet.Add(neighbour);
 					}
-					else // if tenative gscore >= gscore[neighbour]
+					else if (tenativeScore >= gScore[neighbour])
 					{
 						continue;
 					}
 
+					if (cameFrom.ContainsKey(neighbour))
+					{
+						cameFrom[neighbour] = current;
+					}
+					else
+					{
+						cameFrom.Add(neighbour, current);
+					}
+					gScore[neighbour] = tenativeScore;
+					fScore[neighbour] = gScore[neighbour] + HeuristicEstimate(neighbour, goal);
 					// This path is the best until now. Record it!
 					//cameFrom[neighbor] := current
 					//gScore[neighbor] := tentative_gScore
 					//fScore[neighbor] := gScore[neighbor] + heuristic_cost_estimate(neighbor, goal)
 				}
-			}	
+				SortOpenSet();
+			}
 			return null;
+		}
+		
+		private Queue<MapNode> ReconstructPath(MapNode current)
+		{
+			var path = new Queue<MapNode>();
+			path.Enqueue(current);
+			while (cameFrom.Keys.Contains(current))
+			{
+				current = cameFrom[current];
+				//cameFrom.Remove(current);
+				path.Enqueue(current);
+			}
+			return path;
 		}
 
 		private double HeuristicEstimate(MapNode from, MapNode goal)
 		{
-			// TODO Implement me
-			return 0;
+			// TODO Improve me
+			double results = 0;
+			results = from.GetPhysicalPosition().Distance(goal.GetPhysicalPosition());
+			return results;
+		}
+
+		private void SortOpenSet()
+		{
+			//openSet.OrderBy(x => x.Score);
+			openSet.Sort((x, y) => x.Score.CompareTo(y.Score));
+		}
+
+		private void ResetCollections()
+		{
+			foreach (var node in collisionMap.map)
+			{
+				gScore[node] = double.NegativeInfinity;
+				fScore[node] = double.NegativeInfinity;
+			}
 		}
 	}
 }
