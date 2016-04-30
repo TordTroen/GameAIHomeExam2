@@ -34,6 +34,7 @@ namespace HomeExam
 
 		public Queue<MapNode> Search(MapNode start, MapNode goal)
 		{
+			// TODO Use more appropriate datastructures
 			closedSet = new List<MapNode>();
 			openSet = new List<MapNode> { start };
 			ResetCollections();
@@ -107,7 +108,7 @@ namespace HomeExam
 
 		private double HeuristicEstimate(MapNode from, MapNode goal)
 		{
-			// TODO Improve me
+			// TODO Improve me?
 			double results = 0;
 			results = from.GetPhysicalPosition().Distance(goal.GetPhysicalPosition());
 			return results;
@@ -121,6 +122,7 @@ namespace HomeExam
 
 		private void ResetCollections()
 		{
+			cameFrom = new Dictionary<MapNode, MapNode>();
 			foreach (var node in collisionMap.map)
 			{
 				gScore[node] = double.NegativeInfinity;

@@ -16,13 +16,18 @@ namespace HomeExam
 		public long UpdateTime { get; set; } // The time we last set this data
 		public Vector2D Position { get; set; }
 		public Vector2D LastPosition { get; set; }
+		public MapNode CurrentNode { get; set; }
+		private MapNode PreviousNode { get; set; }
+		public bool EnteredNewNode { get { return CurrentNode != PreviousNode; } }
 
 		private readonly Trotor14MechaGodzilla robot;
+		private readonly CollisionMap collisionMap;
 		public const long ValidDataTime = 10;
 
-		public EnemyData(Trotor14MechaGodzilla robot)
+		public EnemyData(Trotor14MechaGodzilla robot, CollisionMap map)
 		{
 			this.robot = robot;
+			collisionMap = map;
 			Position = new Vector2D();
 			LastPosition = new Vector2D();
 			Reset();
@@ -36,6 +41,7 @@ namespace HomeExam
 		public void SetData(ScannedRobotEvent scanEvnt)
 		{
 			LastPosition.Set(Position);
+			PreviousNode = CurrentNode;
 
 			if (scanEvnt != null)
 			{
@@ -53,6 +59,7 @@ namespace HomeExam
 						robot.X + Distance * Math.Sin(b),
 						robot.Y + Distance * Math.Cos(b));
 				}
+				CurrentNode = collisionMap.GetNode(Position, true);
 			}
 			else
 			{

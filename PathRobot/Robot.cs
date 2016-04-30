@@ -52,8 +52,8 @@ namespace PG4500_2016_Exam2
 			driverFSM.EnqueueState(StateManager.StateChaseTarget);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
 
-			startNode = collisionMap.GetNode(0, 0, false);
-			goalNode = collisionMap.GetNode(10, 10, false);
+			startNode = collisionMap.GetNode(0, 10, false);
+			goalNode = collisionMap.GetNode(14, 2, false);
 
 			nodePath = aStarSearch.Search(startNode, goalNode);
 
@@ -66,6 +66,12 @@ namespace PG4500_2016_Exam2
 				Drawing.DrawString(Color.Black, "Commander : " + commanderFSM.CurrentStateID, new Vector2D(0, -50));
 				Drawing.DrawString(Color.Black, "Radar           : " + radarFSM.CurrentStateID, new Vector2D(0, -80));
 				//Drawing.DrawBox(Color.Red, enemyData.Position, 127);
+
+				//startNode = collisionMap.GetNode(Position, true);
+				if (enemyData.EnteredNewNode)
+				{
+					//nodePath = aStarSearch.Search(startNode, enemyData.CurrentNode);
+				}
 
 				TargetNode = collisionMap.GetNode(enemyData.Position, true);
 
@@ -81,8 +87,8 @@ namespace PG4500_2016_Exam2
 			commanderFSM = new FiniteStateMachine("Commander", this);
 			Position = new Vector2D();
 			Drawing = new Drawing(this);
-			enemyData = new EnemyData(this);
 			collisionMap = new CollisionMap(this);
+			enemyData = new EnemyData(this, collisionMap);
 			aStarSearch = new AStarSearch(collisionMap);
 
 			SetColors(Color.LightGray, Color.DimGray, Color.Gray, Color.Yellow, Color.Red);
@@ -113,7 +119,14 @@ namespace PG4500_2016_Exam2
 			MapNode node = collisionMap.GetNode(new Vector2D(e.X, e.Y), true);
 			if (node != null)
 			{
-				goalNode = node;
+				if (e.Button == 1)
+				{
+					startNode = node;
+				}
+				else if (e.Button == 3)
+				{
+					goalNode = node;
+				}
 				nodePath = aStarSearch.Search(startNode, goalNode);
 			}
 		}
@@ -127,6 +140,8 @@ namespace PG4500_2016_Exam2
 			{
 				foreach (var node in nodePath)
 				{
+					//if (node == startNode || node == goalNode) continue;
+
 					graphics.DrawBox(Color.White, node.GetPhysicalPosition(), 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 				}
 			}
