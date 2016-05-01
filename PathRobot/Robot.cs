@@ -66,9 +66,18 @@ namespace PG4500_2016_Exam2
 
 				if (enemyData.EnteredNewNode)
 				{
-					goalNode = enemyData.CurrentNode;
-					TargetNode = null;
-					nodePath = aStarSearch.Search(CurrentNode, goalNode);
+					SetGoalNode(enemyData.CurrentNode);
+					//goalNode = enemyData.CurrentNode;
+					//if (collisionMap.obstacles.Contains(goalNode))
+					//{
+					//	var possibleNodes = goalNode.Neighbours.Except(collisionMap.obstacles).ToList();
+					//	if (possibleNodes.Count > 0)
+					//	{
+					//		goalNode = possibleNodes[0];
+					//	}
+					//}
+					//TargetNode = null;
+					//nodePath = aStarSearch.Search(CurrentNode, goalNode);
 				}
 
 				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode || TargetNode.Neighbours.Contains(CurrentNode)))
@@ -110,6 +119,28 @@ namespace PG4500_2016_Exam2
 			IsAdjustRadarForRobotTurn = false;
 		}
 
+	    private void SetGoalNode(MapNode goal)
+	    {
+		    if (goal == null)
+		    {
+			    throw new ArgumentNullException(nameof(goal), "The specified goal node can't be null!");
+		    }
+
+			goalNode = enemyData.CurrentNode;
+
+			// If the goalnode is a obstacle, use one of the neighbours that probably aren't an obstacle 
+			if (collisionMap.obstacles.Contains(goalNode))
+			{
+				var possibleNodes = goalNode.Neighbours.Except(collisionMap.obstacles).ToList();
+				if (possibleNodes.Count > 0)
+				{
+					goalNode = possibleNodes[0];
+				}
+			}
+			TargetNode = null;
+			nodePath = aStarSearch.Search(CurrentNode, goalNode);
+		}
+
 		/// <summary>
 		/// Does everything that should be done every turn.
 		/// </summary>
@@ -132,9 +163,7 @@ namespace PG4500_2016_Exam2
 			MapNode node = collisionMap.GetNode(new Vector2D(e.X, e.Y), true);
 			if (node != null)
 			{
-				goalNode = node;
-				TargetNode = null;
-				nodePath = aStarSearch.Search(CurrentNode, goalNode);
+				SetGoalNode(node);
 			}
 		}
 

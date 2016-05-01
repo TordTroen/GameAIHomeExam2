@@ -1,0 +1,3 @@
+﻿### Why
+- If the enemy is in an obstacle node, the robot will path to one of the neighbours 
+	- that waythe robot is guaranteed have a node to path to, because in the given collision map every node has atleast one neighbour (including diagonal neighbours) is a non-obstacle node
