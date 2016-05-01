@@ -14,12 +14,14 @@ namespace HomeExam
 		public List<MapNode> Neighbours { get; set; }
 		public MapNode CameFrom { get; set; }
 		public double Score { get; set; }
+		public Vector2D PhysicalPosition { get; private set; }
 
 		public MapNode(int x, int y)
 		{
 			Neighbours = new List<MapNode>();
 			X = x;
 			Y = y;
+			PhysicalPosition = new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize / 2, CollisionMap.NodeSize / 2);
 		}
 
 		public bool IsInsideMapBounds()
@@ -27,10 +29,10 @@ namespace HomeExam
 			return X >= 0 && X < CollisionMap.Width && Y >= 0 && Y < CollisionMap.Height;
 		}
 
-		public Vector2D GetPhysicalPosition()
-		{
-			return new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize/2, CollisionMap.NodeSize/2);
-		}
+		//public Vector2D GetPhysicalPosition()
+		//{
+		//	return new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize/2, CollisionMap.NodeSize/2);
+		//}
 
 		public override bool Equals(object obj)
 		{

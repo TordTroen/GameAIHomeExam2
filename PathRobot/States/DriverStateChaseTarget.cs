@@ -21,7 +21,11 @@ namespace HomeExam.States
 		{
 			string ret = base.OnUpdate();
 
-			seek.Steer(robot.TargetNode.GetPhysicalPosition());
+			//seek.Steer(robot.TargetNode.PhysicalPosition);
+			if (robot.TargetNode != null)
+			{
+				seek.Steer(robot.TargetNode.PhysicalPosition);
+			}
 
 			return ret;
 		}

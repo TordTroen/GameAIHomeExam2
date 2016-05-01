@@ -16,6 +16,7 @@ namespace HomeExam
 		public const int Width = 16; // Number of nodes across
 		public const int Height = 12; // Number of nodes down
 
+		// TODO Could store the nodes in a dictionary with x,y as key for faster lookup
 		public List<MapNode> map = new List<MapNode>(); // The nodes we can move through
 		public List<MapNode> obstacles = new List<MapNode>(); // The nodes we can't move through
 
@@ -168,7 +169,7 @@ namespace HomeExam
 		{
 			foreach (var node in map)
 			{
-				Vector2D pos = node.GetPhysicalPosition();
+				Vector2D pos = node.PhysicalPosition;
 				robot.Drawing.DrawBox(Color.Yellow, pos, 127);
 			}
 		}

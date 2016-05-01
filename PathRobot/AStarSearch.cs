@@ -63,7 +63,7 @@ namespace HomeExam
 					{
 						continue;
 					}
-					tenativeScore = gScore[current] + current.GetPhysicalPosition().Distance(neighbour.GetPhysicalPosition());
+					tenativeScore = gScore[current] + current.PhysicalPosition.Distance(neighbour.PhysicalPosition);
 					if (!openSet.Contains(neighbour))
 					{
 						openSet.Add(neighbour);
@@ -103,14 +103,15 @@ namespace HomeExam
 				//cameFrom.Remove(current);
 				path.Enqueue(current);
 			}
-			return path;
+			return new Queue<MapNode>(path.Reverse());
+			//return path;
 		}
 
 		private double HeuristicEstimate(MapNode from, MapNode goal)
 		{
 			// TODO Improve me?
 			double results = 0;
-			results = from.GetPhysicalPosition().Distance(goal.GetPhysicalPosition());
+			results = from.PhysicalPosition.Distance(goal.PhysicalPosition);
 			return results;
 		}
 
