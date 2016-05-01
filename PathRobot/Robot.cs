@@ -13,7 +13,7 @@ namespace PG4500_2016_Exam2
 {
     public class Trotor14MechaGodzilla : AdvancedRobot
     {
-		public const double Mass = 1;
+		public const double Mass = .1;
 		public const double MaxSpeed = 8;
 		public const double PrefferedEnemyDistance = 250;
 
@@ -42,7 +42,7 @@ namespace PG4500_2016_Exam2
 		private AStarSearch aStarSearch;
 		//private MapNode startNode;
 		private MapNode goalNode;
-		private Queue<MapNode> nodePath;
+		private Stack<MapNode> nodePath;
 
 		public override void Run()
 		{
@@ -71,11 +71,11 @@ namespace PG4500_2016_Exam2
 					nodePath = aStarSearch.Search(CurrentNode, goalNode);
 				}
 
-				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode))
+				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode || TargetNode.Neighbours.Contains(CurrentNode)))
 				{
 					if (nodePath != null && nodePath.Count > 0)
 					{
-						TargetNode = nodePath.Dequeue();
+						TargetNode = nodePath.Pop();
 						Out.WriteLine("New targetnode is: " + TargetNode);
 					}
 					else

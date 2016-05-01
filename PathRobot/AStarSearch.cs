@@ -32,7 +32,7 @@ namespace HomeExam
 			}
 		}
 
-		public Queue<MapNode> Search(MapNode start, MapNode goal)
+		public Stack<MapNode> Search(MapNode start, MapNode goal)
 		{
 			// TODO Use more appropriate datastructures
 			closedSet = new List<MapNode>();
@@ -93,18 +93,18 @@ namespace HomeExam
 			return null;
 		}
 		
-		private Queue<MapNode> ReconstructPath(MapNode current)
+		private Stack<MapNode> ReconstructPath(MapNode current)
 		{
-			var path = new Queue<MapNode>();
-			path.Enqueue(current);
+			var path = new Stack<MapNode>();
+			path.Push(current);
 			while (cameFrom.Keys.Contains(current))
 			{
 				current = cameFrom[current];
 				//cameFrom.Remove(current);
-				path.Enqueue(current);
+				path.Push(current);
 			}
-			return new Queue<MapNode>(path.Reverse());
-			//return path;
+			//return new Queue<MapNode>(path.Reverse());
+			return path;
 		}
 
 		private double HeuristicEstimate(MapNode from, MapNode goal)
