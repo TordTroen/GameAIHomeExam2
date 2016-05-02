@@ -10,94 +10,84 @@ namespace HomeExam
 	{
 		private readonly CollisionMap collisionMap;
 		private List<MapNode> closedSet = new List<MapNode>();
-		private List<MapNode> openSet = new List<MapNode>();
-		private Dictionary<MapNode, double> gScore = new Dictionary<MapNode, double>();
-		private Dictionary<MapNode, double> fScore = new Dictionary<MapNode, double>();
+		private List<MapNode> frontier = new List<MapNode>();
+		private Dictionary<MapNode, double> currentCost = new Dictionary<MapNode, double>();
+		private Dictionary<MapNode, double> priority = new Dictionary<MapNode, double>();
 		private Dictionary<MapNode, MapNode> cameFrom = new Dictionary<MapNode, MapNode>();
 
 		public AStarSearch(CollisionMap map)
 		{
 			collisionMap = map;
 
-			gScore = new Dictionary<MapNode, double>();
-			fScore = new Dictionary<MapNode, double>();
+			currentCost = new Dictionary<MapNode, double>();
+			priority = new Dictionary<MapNode, double>();
 			foreach (var node in collisionMap.map)
 			{
-				if (gScore.ContainsKey(node) || fScore.ContainsKey(node))
+				if (currentCost.ContainsKey(node) || priority.ContainsKey(node))
 				{
 					continue;
 				}
-				gScore.Add(node, double.NegativeInfinity);
-				fScore.Add(node, double.NegativeInfinity);
+				currentCost.Add(node, double.NegativeInfinity);
+				priority.Add(node, double.NegativeInfinity);
 			}
 		}
 
 		public Stack<MapNode> Search(MapNode start, MapNode goal)
 		{
 			// TODO Use more appropriate datastructures
-			closedSet = new List<MapNode>();
-			openSet = new List<MapNode> { start };
+			frontier = new List<MapNode> { start };
 			ResetCollections();
-			gScore[start] = 0;
+			currentCost[start] = 0;
 			start.Score = HeuristicEstimate(start, goal);
-			fScore[start] = start.Score;
+			priority[start] = start.Score;
 			MapNode current = null;
-			double tenativeScore = 0;
+			double newScore = 0;
 
-			while (openSet.Count > 0)
+			while (frontier.Count > 0)
 			{
-				current = openSet[0]; // TODO Get the node from openset with the lowest fscore value
+				current = frontier[0]; // TODO Get the node from openset with the lowest fscore value
 
 				if (current == goal)
 				{
 					// TODO Return path from where we came to goal
-					return ReconstructPath(current);
+					return ReconstructPath(start, current);
 				}
 
-				openSet.Remove(current);
-				closedSet.Add(current);
+				frontier.Remove(current);
 
-				foreach (var neighbour in current.Neighbours)
+				foreach (var nextNode in current.Neighbours)
 				{
-					if (closedSet.Contains(neighbour))
-					{
-						continue;
-					}
-					tenativeScore = gScore[current] + current.PhysicalPosition.Distance(neighbour.PhysicalPosition);
-					if (!openSet.Contains(neighbour))
-					{
-						openSet.Add(neighbour);
-					}
-					else if (tenativeScore >= gScore[neighbour])
+					if (cameFrom.ContainsKey(nextNode))
 					{
 						continue;
 					}
 
-					if (cameFrom.ContainsKey(neighbour))
+					newScore = currentCost[current] + current.PhysicalPosition.Distance(nextNode.PhysicalPosition);
+
+					if (!frontier.Contains(nextNode))
 					{
-						cameFrom[neighbour] = current;
+						frontier.Add(nextNode);
 					}
-					else
+					else if (newScore >= currentCost[nextNode])
 					{
-						cameFrom.Add(neighbour, current);
+						continue;
 					}
-					gScore[neighbour] = tenativeScore;
-					fScore[neighbour] = gScore[neighbour] + HeuristicEstimate(neighbour, goal);
-					// This path is the best until now. Record it!
-					//cameFrom[neighbor] := current
-					//gScore[neighbor] := tentative_gScore
-					//fScore[neighbor] := gScore[neighbor] + heuristic_cost_estimate(neighbor, goal)
+
+					cameFrom[nextNode] = current;
+					currentCost[nextNode] = newScore;
+					priority[nextNode] = currentCost[nextNode] + HeuristicEstimate(nextNode, goal);
 				}
-				SortOpenSet();
+				SortFrontier();
 			}
 			return null;
 		}
 		
-		private Stack<MapNode> ReconstructPath(MapNode current)
+		private Stack<MapNode> ReconstructPath(MapNode start, MapNode current)
 		{
 			var path = new Stack<MapNode>();
 			path.Push(current);
-			while (cameFrom.Keys.Contains(current))
+			//while (cameFrom.Keys.Contains(current))
+			while (current != start)
 			{
 				current = cameFrom[current];
 				//cameFrom.Remove(current);
@@ -115,10 +105,10 @@ namespace HomeExam
 			return results;
 		}
 
-		private void SortOpenSet()
+		private void SortFrontier()
 		{
 			//openSet.OrderBy(x => x.Score);
-			openSet.Sort((x, y) => x.Score.CompareTo(y.Score));
+			frontier.Sort((x, y) => -x.Score.CompareTo(y.Score));
 		}
 
 		private void ResetCollections()
@@ -126,8 +116,8 @@ namespace HomeExam
 			cameFrom = new Dictionary<MapNode, MapNode>();
 			foreach (var node in collisionMap.map)
 			{
-				gScore[node] = double.NegativeInfinity;
-				fScore[node] = double.NegativeInfinity;
+				currentCost[node] = double.NegativeInfinity;
+				priority[node] = double.NegativeInfinity;
 			}
 		}
 	}

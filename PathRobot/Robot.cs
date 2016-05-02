@@ -43,6 +43,7 @@ namespace PG4500_2016_Exam2
 		//private MapNode startNode;
 		private MapNode goalNode;
 		private Stack<MapNode> nodePath;
+		private bool currentNodeIsRobot = true;
 
 		public override void Run()
 		{
@@ -66,7 +67,7 @@ namespace PG4500_2016_Exam2
 
 				if (enemyData.EnteredNewNode)
 				{
-					SetGoalNode(enemyData.CurrentNode);
+					//SetGoalNode(enemyData.CurrentNode);
 					//goalNode = enemyData.CurrentNode;
 					//if (collisionMap.obstacles.Contains(goalNode))
 					//{
@@ -126,7 +127,7 @@ namespace PG4500_2016_Exam2
 			    throw new ArgumentNullException(nameof(goal), "The specified goal node can't be null!");
 		    }
 
-			goalNode = enemyData.CurrentNode;
+			goalNode = goal;// enemyData.CurrentNode;
 
 			// If the goalnode is a obstacle, use one of the neighbours that probably aren't an obstacle 
 			if (collisionMap.obstacles.Contains(goalNode))
@@ -146,9 +147,11 @@ namespace PG4500_2016_Exam2
 		/// </summary>
 		private void UpdateBot()
 		{
-			
 			Position.Set(X, Y);
-			CurrentNode = collisionMap.GetNode(Position, true);
+
+			// for debugging
+			if (currentNodeIsRobot)
+				CurrentNode = collisionMap.GetNode(Position, true);
 		}
 
 		public override void OnScannedRobot(ScannedRobotEvent evnt)
@@ -174,15 +177,20 @@ namespace PG4500_2016_Exam2
 			{
 				// Left click to set startnode
 				// Right click to set goalnode
-				if (e.Button == 1)
+				if (e.Button == 1 && goalNode != null)
 				{
-					goalNode = node;
+					//CurrentNode = node;
 					TargetNode = null;
-					nodePath = aStarSearch.Search(CurrentNode, goalNode);
+					nodePath = aStarSearch.Search(node, goalNode);
+				}
+				if (e.Button == 2)
+				{
+					currentNodeIsRobot = !currentNodeIsRobot;
 				}
 				else if (e.Button == 3)
 				{
 					//goalNode = node;
+					SetGoalNode(node);
 				}
 			}
 		}
