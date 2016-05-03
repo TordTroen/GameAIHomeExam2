@@ -14,8 +14,7 @@ namespace PG4500_2016_Exam2
     public class Trotor14MechaGodzilla : AdvancedRobot
     {
 		public const double Mass = .1;
-		public const double MaxSpeed = 8;
-		public const double PrefferedEnemyDistance = 250;
+		public const double MaxSpeed = 80;
 
 		public Vector2D Position { get; private set; }
 		public Vector2D VelocityVector
@@ -51,7 +50,7 @@ namespace PG4500_2016_Exam2
 			
 			radarFSM.EnqueueState(StateManager.StateRadarSweep);
 			//driverFSM.EnqueueState(StateManager.StateChaseTarget);
-			driverFSM.EnqueueState(StateManager.StateIdle);
+			driverFSM.EnqueueState(StateManager.StateChaseTarget);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
 
 			//startNode = collisionMap.GetNode(0, 10, false);
@@ -80,7 +79,7 @@ namespace PG4500_2016_Exam2
 
 				if (enemyData.EnteredNewNode)
 				{
-					//SetGoalNode(enemyData.CurrentNode);
+					SetGoalNode(enemyData.CurrentNode);
 
 					//goalNode = enemyData.CurrentNode;
 					//if (collisionMap.obstacles.Contains(goalNode))
@@ -95,19 +94,19 @@ namespace PG4500_2016_Exam2
 					//nodePath = aStarSearch.Search(CurrentNode, goalNode);
 				}
 
-				//if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode || TargetNode.Neighbours.Contains(CurrentNode)))
-				//{
-				//	if (nodePath != null && nodePath.Count > 0)
-				//	{
-				//		TargetNode = nodePath.Pop();
-				//		//Out.WriteLine("New targetnode is: " + TargetNode);
-				//	}
-				//	else
-				//	{
-				//		TargetNode = null;
-				//		//Out.WriteLine("Targetnode is null");
-				//	}
-				//}
+				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode || TargetNode.Neighbours.Contains(CurrentNode)))
+				{
+					if (nodePath != null && nodePath.Count > 0)
+					{
+						TargetNode = nodePath.Pop();
+						//Out.WriteLine("New targetnode is: " + TargetNode);
+					}
+					else
+					{
+						TargetNode = null;
+						//Out.WriteLine("Targetnode is null");
+					}
+				}
 
 				radarFSM.Update();
 				driverFSM.Update();

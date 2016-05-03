@@ -37,7 +37,7 @@ namespace HomeExam
 
 		public Stack<MapNode> Search(MapNode start, MapNode goal)
 		{
-			robot.Out.WriteLine("--- using A* v2 ---");
+			//robot.Out.WriteLine("--- using A* v2 ---");
 			var open = new List<MapNode>();
 			var closed = new List<MapNode>();
 			foreach (var node in collisionMap.map)
@@ -48,57 +48,58 @@ namespace HomeExam
 			}
 			start.G = 0;
 			start.H = 0;
+			start.Parent = null;
 			open.Add(start);
 
 			while (open.Count > 0)
 			{
 				var current = GetLowestFNode(open);
 				open.Remove(current);
-				robot.Out.WriteLine("Node: " + current);
+				//robot.Out.WriteLine("Node: " + current);
+
+				// If the current node is the goal we stop and recreate the path
+				if (current == goal)
+				{
+					//robot.Print("Node " + current + " is goal, creating path...");
+					return ReconstructPath(goal);
+				}
 
 				foreach (var neighbour in current.Neighbours)
 				{
-					
-					if (current == goal)
-					{
-						robot.Print("Node " + current + " is goal, creating path...");
-						return MakePath(goal);
-					}
+					// Skip this neighbour if the parent is already set or the neibour has already been processed 
 					if (neighbour.Parent != null || closed.Contains(neighbour)) continue;
 
 					neighbour.Parent = current;
-					robot.Print("-> " + neighbour + " (" + neighbour.Parent + ")");
+					//robot.Print("-> " + neighbour + " (" + neighbour.Parent + ")");
 
 					var newG = current.G + neighbour.PhysicalPosition.Distance(current.PhysicalPosition);
 					neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
-					neighbour.F = neighbour.G + neighbour.H;
+					neighbour.F = neighbour.G + neighbour.H; // TODO is this best, or is calculating F after setting G best?
 
 					if (newG >= neighbour.G)
 					{
 						continue;
 					}
-					if (!closed.Contains(neighbour))
-					{
-						robot.Print("Adding successor to frontier: " + neighbour);
-						open.Add(neighbour);
-					}
+
+					//robot.Print("Adding successor to frontier: " + neighbour);
+					open.Add(neighbour);
 					neighbour.G = newG;
+					//neighbour.F = neighbour.G + neighbour.H;
 				}
 				closed.Add(current);
 			}
 
+			robot.Print("Couldn't find a goal!");
 			return null;
-			//return MakePath(start, goal);
 		}
 
-		private Stack<MapNode> MakePath(MapNode goal)
+
+		private Stack<MapNode> ReconstructPath(MapNode goal)
 		{
 			var path = new Stack<MapNode>();
-			// TODO implement me
 			var current = goal;
-			while (current != null && path.Count < CollisionMap.Width + CollisionMap.Height)
+			while (current != null)
 			{
-				//robot.Print("- Adding " + current + " to path");
 				path.Push(current);
 				current = current.Parent;
 			}
@@ -116,135 +117,133 @@ namespace HomeExam
 					best = i;
 				}
 			}
-			MapNode node = list[best];
-			//list.RemoveAt(best);
-			return node;
+			return list[best];
 		}
 
-		public Stack<MapNode> Search2(MapNode start, MapNode goal)
-		{
-			robot.Out.WriteLine("--- using A* v1 ---");
+		//	public Stack<MapNode> Search2(MapNode start, MapNode goal)
+		//	{
+		//		robot.Out.WriteLine("--- using A* v1 ---");
 
-			// TODO Use more appropriate datastructures
-			frontier = new List<MapNode> { start };
-			ResetCollections();
-			currentCost[start] = 0;
-			start.Score = H(start, goal);
-			priority[start] = start.Score;
+		//		// TODO Use more appropriate datastructures
+		//		frontier = new List<MapNode> { start };
+		//		ResetCollections();
+		//		currentCost[start] = 0;
+		//		start.Score = H(start, goal);
+		//		priority[start] = start.Score;
 
-			while (frontier.Count > 0)
-			{
-				var current = frontier[0];
+		//		while (frontier.Count > 0)
+		//		{
+		//			var current = frontier[0];
 
-				// Stop and reconstruct the path if current is the goal
-				if (current == goal)
-				{
-					// Return path from where we came to goal
-					return ReconstructPath(start, goal);
-				}
+		//			// Stop and reconstruct the path if current is the goal
+		//			if (current == goal)
+		//			{
+		//				// Return path from where we came to goal
+		//				return ReconstructPath(start, goal);
+		//			}
 
-				frontier.Remove(current);
+		//			frontier.Remove(current);
 
-				// Check all of the neighbours of the current node
-				foreach (var nextNode in current.Neighbours)
-				{
-					// Check if node is already processed
-					if (cameFrom.ContainsKey(nextNode))
-					{
-						continue;
-					}
+		//			// Check all of the neighbours of the current node
+		//			foreach (var nextNode in current.Neighbours)
+		//			{
+		//				// Check if node is already processed
+		//				if (cameFrom.ContainsKey(nextNode))
+		//				{
+		//					continue;
+		//				}
 
-					var newScore = currentCost[current] + current.PhysicalPosition.Distance(nextNode.PhysicalPosition);
-					//var tenativeGscore = currentCost[current] + G(current, goal);
-					// Something wrong here I think, currentCost isn't right
-					// Probably store h and g score on the nodes
-
-
-					if (!frontier.Contains(nextNode))
-					{
-						frontier.Add(nextNode);
-					}
-					else if (newScore >= currentCost[current])
-					{
-						continue;
-					}
-
-					cameFrom[nextNode] = current;
-					currentCost[nextNode] = newScore;
-					priority[nextNode] = currentCost[nextNode] + H(nextNode, goal);
-				}
-				SortFrontier();
-			}
-			return null;
-		}
-
-		private Stack<MapNode> ReconstructPath(MapNode start, MapNode current)
-		{
-			var path = new Stack<MapNode>();
-			path.Push(current);
-			//while (cameFrom.Keys.Contains(current))
-			while (current != start)
-			//while(cameFrom.ContainsKey(current))
-			{
-				current = cameFrom[current];
-				//cameFrom.Remove(current);
-				path.Push(current);
-			}
-			//return new Queue<MapNode>(path.Reverse());
-			return path;
-		}
-
-		private double G(MapNode from, MapNode to)
-		{
-			double results = 0;
-			results = from.PhysicalPosition.Distance(to.PhysicalPosition);
-			return results;
-		}
-
-		private double H(MapNode from, MapNode goal)
-		{
-			// TODO Improve me?
-			double results = 0;
-			//return Math.Abs(from.X - goal.X) + Math.Abs(from.Y - goal.Y);
-
-			// fidn number of squares
-			// multiply by nidesize
-
-			//dx = abs(node.x - goal.x)
-			//dy = abs(node.y - goal.y)
-			//double dx = Math.Abs(from.X - goal.X);
-			//double dy = Math.Abs(from.Y - goal.Y);
-			//double D = 1;
-			//return D * (dx + dy);
-			//return D*(dx + dy) + (D - 2*D)*Math.Min(dx, dy);
-			//return D*Math.Sqrt(dx*dx + dy*dy);
-
-			//7 * (deltaX + deltaY)
-			//int ld = Math.Min(CollisionMap.Width, CollisionMap.Height);
-			//int dx = goal.X - from.X;
-			//int dy = goal.Y - from.Y;
-			//// ld / 2 * dx + dy
-			//results = (ld / 2) * (dx + dy);
+		//				var newScore = currentCost[current] + current.PhysicalPosition.Distance(nextNode.PhysicalPosition);
+		//				//var tenativeGscore = currentCost[current] + G(current, goal);
+		//				// Something wrong here I think, currentCost isn't right
+		//				// Probably store h and g score on the nodes
 
 
-			results = from.PhysicalPosition.Distance(goal.PhysicalPosition);
-			return results;
-		}
+		//				if (!frontier.Contains(nextNode))
+		//				{
+		//					frontier.Add(nextNode);
+		//				}
+		//				else if (newScore >= currentCost[current])
+		//				{
+		//					continue;
+		//				}
 
-		private void SortFrontier()
-		{
-			//openSet.OrderBy(x => x.Score);
-			frontier.Sort((x, y) => -x.Score.CompareTo(y.Score));
-		}
+		//				cameFrom[nextNode] = current;
+		//				currentCost[nextNode] = newScore;
+		//				priority[nextNode] = currentCost[nextNode] + H(nextNode, goal);
+		//			}
+		//			SortFrontier();
+		//		}
+		//		return null;
+		//	}
 
-		private void ResetCollections()
-		{
-			cameFrom = new Dictionary<MapNode, MapNode>();
-			foreach (var node in collisionMap.map)
-			{
-				currentCost[node] = double.NegativeInfinity;
-				priority[node] = double.NegativeInfinity;
-			}
-		}
+		//	private Stack<MapNode> ReconstructPath(MapNode start, MapNode current)
+		//	{
+		//		var path = new Stack<MapNode>();
+		//		path.Push(current);
+		//		//while (cameFrom.Keys.Contains(current))
+		//		while (current != start)
+		//		//while(cameFrom.ContainsKey(current))
+		//		{
+		//			current = cameFrom[current];
+		//			//cameFrom.Remove(current);
+		//			path.Push(current);
+		//		}
+		//		//return new Queue<MapNode>(path.Reverse());
+		//		return path;
+		//	}
+
+		//	private double G(MapNode from, MapNode to)
+		//	{
+		//		double results = 0;
+		//		results = from.PhysicalPosition.Distance(to.PhysicalPosition);
+		//		return results;
+		//	}
+
+		//	private double H(MapNode from, MapNode goal)
+		//	{
+		//		// TODO Improve me?
+		//		double results = 0;
+		//		//return Math.Abs(from.X - goal.X) + Math.Abs(from.Y - goal.Y);
+
+		//		// fidn number of squares
+		//		// multiply by nidesize
+
+		//		//dx = abs(node.x - goal.x)
+		//		//dy = abs(node.y - goal.y)
+		//		//double dx = Math.Abs(from.X - goal.X);
+		//		//double dy = Math.Abs(from.Y - goal.Y);
+		//		//double D = 1;
+		//		//return D * (dx + dy);
+		//		//return D*(dx + dy) + (D - 2*D)*Math.Min(dx, dy);
+		//		//return D*Math.Sqrt(dx*dx + dy*dy);
+
+		//		//7 * (deltaX + deltaY)
+		//		//int ld = Math.Min(CollisionMap.Width, CollisionMap.Height);
+		//		//int dx = goal.X - from.X;
+		//		//int dy = goal.Y - from.Y;
+		//		//// ld / 2 * dx + dy
+		//		//results = (ld / 2) * (dx + dy);
+
+
+		//		results = from.PhysicalPosition.Distance(goal.PhysicalPosition);
+		//		return results;
+		//	}
+
+		//	private void SortFrontier()
+		//	{
+		//		//openSet.OrderBy(x => x.Score);
+		//		frontier.Sort((x, y) => -x.Score.CompareTo(y.Score));
+		//	}
+
+		//	private void ResetCollections()
+		//	{
+		//		cameFrom = new Dictionary<MapNode, MapNode>();
+		//		foreach (var node in collisionMap.map)
+		//		{
+		//			currentCost[node] = double.NegativeInfinity;
+		//			priority[node] = double.NegativeInfinity;
+		//		}
+		//	}
 	}
 }
