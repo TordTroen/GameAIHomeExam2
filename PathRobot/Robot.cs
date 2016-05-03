@@ -43,7 +43,6 @@ namespace PG4500_2016_Exam2
 		//private MapNode startNode;
 		private MapNode goalNode;
 		private Stack<MapNode> nodePath;
-		private bool currentNodeIsRobot = true;
 
 		public override void Run()
 		{
@@ -51,7 +50,8 @@ namespace PG4500_2016_Exam2
 			//TargetNode = collisionMap.GetNode(new Vector2D(25, 25), false);
 			
 			radarFSM.EnqueueState(StateManager.StateRadarSweep);
-			driverFSM.EnqueueState(StateManager.StateChaseTarget);
+			//driverFSM.EnqueueState(StateManager.StateChaseTarget);
+			driverFSM.EnqueueState(StateManager.StateIdle);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
 
 			//startNode = collisionMap.GetNode(0, 10, false);
@@ -60,6 +60,19 @@ namespace PG4500_2016_Exam2
 
 			//UpdateBot();
 			//nodePath = aStarSearch.Search(CurrentNode, goalNode);
+			TargetNode = collisionMap.GetNode(0, 0, false);
+			goalNode = collisionMap.GetNode(15, 4, false);
+			
+			//SetGoalNode(b);
+			nodePath = aStarSearch.Search(TargetNode, goalNode);
+			Out.WriteLine("======================");
+			Out.WriteLine("Path:");
+			foreach (var node in nodePath)
+			{
+				Out.WriteLine("=> " + node);
+			}
+			Out.WriteLine("======================");
+
 
 			while (true)
 			{
@@ -82,19 +95,19 @@ namespace PG4500_2016_Exam2
 					//nodePath = aStarSearch.Search(CurrentNode, goalNode);
 				}
 
-				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode || TargetNode.Neighbours.Contains(CurrentNode)))
-				{
-					if (nodePath != null && nodePath.Count > 0)
-					{
-						TargetNode = nodePath.Pop();
-						//Out.WriteLine("New targetnode is: " + TargetNode);
-					}
-					else
-					{
-						TargetNode = null;
-						//Out.WriteLine("Targetnode is null");
-					}
-				}
+				//if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode || TargetNode.Neighbours.Contains(CurrentNode)))
+				//{
+				//	if (nodePath != null && nodePath.Count > 0)
+				//	{
+				//		TargetNode = nodePath.Pop();
+				//		//Out.WriteLine("New targetnode is: " + TargetNode);
+				//	}
+				//	else
+				//	{
+				//		TargetNode = null;
+				//		//Out.WriteLine("Targetnode is null");
+				//	}
+				//}
 
 				radarFSM.Update();
 				driverFSM.Update();
@@ -113,7 +126,7 @@ namespace PG4500_2016_Exam2
 			Drawing = new Drawing(this);
 			collisionMap = new CollisionMap(this);
 			enemyData = new EnemyData(this, collisionMap);
-			aStarSearch = new AStarSearch(collisionMap);
+			aStarSearch = new AStarSearch(this, collisionMap);
 
 			SetColors(Color.LightGray, Color.DimGray, Color.Gray, Color.Yellow, Color.Red);
 			IsAdjustRadarForGunTurn = false;
@@ -150,9 +163,12 @@ namespace PG4500_2016_Exam2
 		{
 			Position.Set(X, Y);
 
-			// for debugging
-			if (currentNodeIsRobot)
-				CurrentNode = collisionMap.GetNode(Position, true);
+			CurrentNode = collisionMap.GetNode(Position, true);
+		}
+
+		public void Print(string msg)
+		{
+			Out.WriteLine(msg);
 		}
 
 		public override void OnScannedRobot(ScannedRobotEvent evnt)
@@ -163,12 +179,11 @@ namespace PG4500_2016_Exam2
 
 		public override void OnMouseMoved(MouseEvent e)
 		{
-			return;
-			MapNode node = collisionMap.GetNode(new Vector2D(e.X, e.Y), true);
-			if (node != null)
-			{
-				SetGoalNode(node);
-			}
+			//MapNode node = collisionMap.GetNode(new Vector2D(e.X, e.Y), true);
+			//if (node != null)
+			//{
+			//	SetGoalNode(node);
+			//}
 		}
 
 		public override void OnMouseClicked(MouseEvent e)
@@ -184,10 +199,6 @@ namespace PG4500_2016_Exam2
 					TargetNode = null;
 					nodePath = aStarSearch.Search(node, goalNode);
 				}
-				if (e.Button == 2)
-				{
-					currentNodeIsRobot = !currentNodeIsRobot;
-				}
 				else if (e.Button == 3)
 				{
 					//goalNode = node;
@@ -200,11 +211,11 @@ namespace PG4500_2016_Exam2
 		{
 			if (CurrentNode != null)
 			{
-				Drawing.DrawBox(Color.Blue, CurrentNode.PhysicalPosition, 50, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				Drawing.DrawBox(Color.Blue, CurrentNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 			if (goalNode != null)
 			{
-				Drawing.DrawBox(Color.Green, goalNode.PhysicalPosition, 50, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				Drawing.DrawBox(Color.Green, goalNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 
 			if (TargetNode != null)

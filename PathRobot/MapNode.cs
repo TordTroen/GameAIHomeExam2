@@ -16,6 +16,11 @@ namespace HomeExam
 		public double Score { get; set; }
 		public Vector2D PhysicalPosition { get; private set; }
 
+		public double G { get; set; }
+		public double H { get; set; }
+		public double F { get; set; }
+		public MapNode Parent { get; set; }
+
 		public MapNode(int x, int y)
 		{
 			Neighbours = new List<MapNode>();
