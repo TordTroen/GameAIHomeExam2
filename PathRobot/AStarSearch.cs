@@ -38,44 +38,49 @@ namespace HomeExam
 			frontier = new List<MapNode> { start };
 			ResetCollections();
 			currentCost[start] = 0;
-			start.Score = HeuristicEstimate(start, goal);
+			start.Score = H(start, goal);
 			priority[start] = start.Score;
-			MapNode current = null;
-			double newScore = 0;
 
 			while (frontier.Count > 0)
 			{
-				current = frontier[0]; // TODO Get the node from openset with the lowest fscore value
+				var current = frontier[0];
 
+				// Stop and reconstruct the path if current is the goal
 				if (current == goal)
 				{
-					// TODO Return path from where we came to goal
+					// Return path from where we came to goal
 					return ReconstructPath(start, current);
 				}
 
 				frontier.Remove(current);
 
+				// Check all of the neighbours of the current node
 				foreach (var nextNode in current.Neighbours)
 				{
+					// Check if node is already processed
 					if (cameFrom.ContainsKey(nextNode))
 					{
 						continue;
 					}
 
-					newScore = currentCost[current] + current.PhysicalPosition.Distance(nextNode.PhysicalPosition);
+					//var newScore = currentCost[current] + current.PhysicalPosition.Distance(nextNode.PhysicalPosition);
+					var tenativeGscore = currentCost[current] + G(current, goal); 
+					// Something wrong here I think, currentCost isn't right
+					// Probably store h and g score on the nodes
+
 
 					if (!frontier.Contains(nextNode))
 					{
 						frontier.Add(nextNode);
 					}
-					else if (newScore >= currentCost[nextNode])
+					else if (tenativeGscore >= currentCost[current])
 					{
 						continue;
 					}
 
 					cameFrom[nextNode] = current;
-					currentCost[nextNode] = newScore;
-					priority[nextNode] = currentCost[nextNode] + HeuristicEstimate(nextNode, goal);
+					currentCost[nextNode] = tenativeGscore;
+					priority[nextNode] = currentCost[nextNode] + H(nextNode, goal);
 				}
 				SortFrontier();
 			}
@@ -97,10 +102,39 @@ namespace HomeExam
 			return path;
 		}
 
-		private double HeuristicEstimate(MapNode from, MapNode goal)
+		private double G(MapNode from, MapNode to)
+		{
+			double results = 0;
+			results = from.PhysicalPosition.Distance(to.PhysicalPosition);
+			return results;
+		}
+
+		private double H(MapNode from, MapNode goal)
 		{
 			// TODO Improve me?
 			double results = 0;
+			//return Math.Abs(from.X - goal.X) + Math.Abs(from.Y - goal.Y);
+
+			// fidn number of squares
+			// multiply by nidesize
+
+			//dx = abs(node.x - goal.x)
+			//dy = abs(node.y - goal.y)
+			//double dx = Math.Abs(from.X - goal.X);
+			//double dy = Math.Abs(from.Y - goal.Y);
+			//double D = 1;
+			//return D * (dx + dy);
+			//return D*(dx + dy) + (D - 2*D)*Math.Min(dx, dy);
+			//return D*Math.Sqrt(dx*dx + dy*dy);
+
+			//7 * (deltaX + deltaY)
+			//int ld = Math.Min(CollisionMap.Width, CollisionMap.Height);
+			//int dx = goal.X - from.X;
+			//int dy = goal.Y - from.Y;
+			//// ld / 2 * dx + dy
+			//results = (ld / 2) * (dx + dy);
+
+
 			results = from.PhysicalPosition.Distance(goal.PhysicalPosition);
 			return results;
 		}

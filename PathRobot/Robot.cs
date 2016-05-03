@@ -22,9 +22,9 @@ namespace PG4500_2016_Exam2
 		{
 			get
 			{
-				if (Velocity.IsZero())
+				if (Velocity.IsZero()) // If we aren't moving return an empty vector so we don't have to do the cos/sin
 				{
-					return new Vector2D();
+					return new Vector2D(0, 0);
 				}
 				return new Vector2D(Velocity * Math.Cos(HeadingRadians), Velocity * Math.Sin(HeadingRadians));
 			}
@@ -68,6 +68,7 @@ namespace PG4500_2016_Exam2
 				if (enemyData.EnteredNewNode)
 				{
 					//SetGoalNode(enemyData.CurrentNode);
+
 					//goalNode = enemyData.CurrentNode;
 					//if (collisionMap.obstacles.Contains(goalNode))
 					//{
@@ -86,12 +87,12 @@ namespace PG4500_2016_Exam2
 					if (nodePath != null && nodePath.Count > 0)
 					{
 						TargetNode = nodePath.Pop();
-						Out.WriteLine("New targetnode is: " + TargetNode);
+						//Out.WriteLine("New targetnode is: " + TargetNode);
 					}
 					else
 					{
 						TargetNode = null;
-						Out.WriteLine("Targetnode is null");
+						//Out.WriteLine("Targetnode is null");
 					}
 				}
 
