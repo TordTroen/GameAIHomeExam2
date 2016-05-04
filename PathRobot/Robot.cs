@@ -15,6 +15,7 @@ namespace PG4500_2016_Exam2
     {
 		public const double Mass = 0.01;
 		public const double MaxSpeed = 6;
+		private const double TargetNodeDistance = 54;
 
 		public Vector2D Position { get; private set; }
 		public Vector2D VelocityVector
@@ -28,8 +29,9 @@ namespace PG4500_2016_Exam2
 				return new Vector2D(Velocity * Math.Cos(HeadingRadians), Velocity * Math.Sin(HeadingRadians));
 			}
 		}
-		public MapNode CurrentNode { get; private set; }
+		private MapNode CurrentNode { get; set; }
 		public MapNode TargetNode { get; private set; }
+		private MapNode GoalNode { get; set; }
 
 		public Drawing Drawing { get; private set; }
 		public EnemyData enemyData { get; private set;}
@@ -39,47 +41,44 @@ namespace PG4500_2016_Exam2
 		private FiniteStateMachine commanderFSM;
 		private CollisionMap collisionMap;
 		private AStarSearch aStarSearch;
-		//private MapNode startNode;
-		private MapNode goalNode;
 		private Stack<MapNode> nodePath;
 
 		public override void Run()
 		{
 			InitializeBot();
-			//TargetNode = collisionMap.GetNode(new Vector2D(25, 25), false);
 			
 			radarFSM.EnqueueState(StateManager.StateRadarSweep);
-			//driverFSM.EnqueueState(StateManager.StateChaseTarget);
 			driverFSM.EnqueueState(StateManager.StateChaseTarget);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
 
-			//startNode = collisionMap.GetNode(0, 10, false);
-			//goalNode = collisionMap.GetNode(14, 2, false);
-			//goalNode = collisionMap.GetNode(new Vector2D(25, 25), false);
+			// This was used for testing the algorithm
+			////startNode = collisionMap.GetNode(0, 10, false);
+			////goalNode = collisionMap.GetNode(14, 2, false);
+			////goalNode = collisionMap.GetNode(new Vector2D(25, 25), false);
 
-			//UpdateBot();
-			//nodePath = aStarSearch.Search(CurrentNode, goalNode);
-			TargetNode = collisionMap.GetNode(0, 0, false);
-			goalNode = collisionMap.GetNode(15, 4, false);
+			////UpdateBot();
+			////nodePath = aStarSearch.Search(CurrentNode, goalNode);
+			//TargetNode = collisionMap.GetNode(0, 0, false);
+			//goalNode = collisionMap.GetNode(15, 4, false);
 			
-			//SetGoalNode(b);
-			nodePath = aStarSearch.Search(TargetNode, goalNode);
-			Out.WriteLine("======================");
-			Out.WriteLine("Path:");
-			foreach (var node in nodePath)
-			{
-				Out.WriteLine("=> " + node);
-			}
-			Out.WriteLine("======================");
+			////SetGoalNode(b);
+			//nodePath = aStarSearch.Search(TargetNode, goalNode);
+			//Out.WriteLine("======================");
+			//Out.WriteLine("Path:");
+			//foreach (var node in nodePath)
+			//{
+			//	Out.WriteLine("=> " + node);
+			//}
+			//Out.WriteLine("======================");
 
 
 			while (true)
 			{
 				UpdateBot();
 
-				if (enemyData.EnteredNewNode)
+				//if (enemyData.EnteredNewNode)
 				{
-					SetGoalNode(enemyData.CurrentNode);
+					//SetGoalNode(enemyData.CurrentNode);
 
 					//goalNode = enemyData.CurrentNode;
 					//if (collisionMap.obstacles.Contains(goalNode))
@@ -93,8 +92,22 @@ namespace PG4500_2016_Exam2
 					//TargetNode = null;
 					//nodePath = aStarSearch.Search(CurrentNode, goalNode);
 				}
+				//var enemyNode = collisionMap.GetNode(enemyData.Position, true);
+				//if (enemyNode != null)
+				//{
+				//	SetGoalNode(enemyNode);
+				//}
+				if (enemyData.CurrentNode != null)
+				{
+					//SetGoalNode(enemyData.CurrentNode);
+				}
 
-				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode))// || TargetNode.Neighbours.Contains(CurrentNode)))
+				bool reachedTargetNode = CurrentNode == TargetNode;
+				if (TargetNode != null)
+				{
+					reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
+				}
+				if (GoalNode != null && (reachedTargetNode || TargetNode == null))
 				{
 					if (nodePath != null && nodePath.Count > 0)
 					{
@@ -141,19 +154,25 @@ namespace PG4500_2016_Exam2
 			    throw new ArgumentNullException(nameof(goal), "The specified goal node can't be null!");
 		    }
 
-			goalNode = goal;// enemyData.CurrentNode;
+			GoalNode = goal;// enemyData.CurrentNode;
 
 			// If the goalnode is a obstacle, use one of the neighbours that probably aren't an obstacle 
-			if (collisionMap.obstacles.Contains(goalNode))
+			if (collisionMap.obstacles.Contains(GoalNode))
 			{
-				var possibleNodes = goalNode.Neighbours.Except(collisionMap.obstacles).ToList();
+				var possibleNodes = GoalNode.Neighbours.Except(collisionMap.obstacles).ToList();
 				if (possibleNodes.Count > 0)
 				{
-					goalNode = possibleNodes[0];
+					GoalNode = possibleNodes[0];
 				}
 			}
 			TargetNode = null;
-			nodePath = aStarSearch.Search(CurrentNode, goalNode);
+			nodePath = aStarSearch.Search(CurrentNode, GoalNode);
+		}
+
+		public void OnEnemyMovedNode()
+		{
+			Print("Enemy moved");
+			SetGoalNode(enemyData.CurrentNode);
 		}
 
 		/// <summary>
@@ -193,11 +212,11 @@ namespace PG4500_2016_Exam2
 			{
 				// Left click to set startnode
 				// Right click to set goalnode
-				if (e.Button == 1 && goalNode != null)
+				if (e.Button == 1 && GoalNode != null)
 				{
 					//CurrentNode = node;
 					TargetNode = null;
-					nodePath = aStarSearch.Search(node, goalNode);
+					nodePath = aStarSearch.Search(node, GoalNode);
 				}
 				else if (e.Button == 3)
 				{
@@ -213,9 +232,9 @@ namespace PG4500_2016_Exam2
 			{
 				Drawing.DrawBox(Color.Blue, CurrentNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
-			if (goalNode != null)
+			if (GoalNode != null)
 			{
-				Drawing.DrawBox(Color.Green, goalNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				Drawing.DrawBox(Color.Green, GoalNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 
 			if (TargetNode != null)
@@ -246,8 +265,11 @@ namespace PG4500_2016_Exam2
 			//}
 
 			Drawing.DrawString(Color.Black, "Driver          : " + driverFSM.CurrentStateID, new Vector2D(0, -20));
-			Drawing.DrawString(Color.Black, "Commander : " + commanderFSM.CurrentStateID, new Vector2D(0, -50));
-			Drawing.DrawString(Color.Black, "Radar           : " + radarFSM.CurrentStateID, new Vector2D(0, -80));
+			Drawing.DrawString(Color.Black, "Commander : " + commanderFSM.CurrentStateID, new Vector2D(0, -40));
+			Drawing.DrawString(Color.Black, "Radar           : " + radarFSM.CurrentStateID, new Vector2D(0, -60));
+			Drawing.DrawString(Color.Black, "CurrentNode: " + CurrentNode, new Vector2D(0, -80));
+			Drawing.DrawString(Color.Black, "TargetNode: " + TargetNode, new Vector2D(0, -100));
+			Drawing.DrawString(Color.Black, "GoalNode: " + GoalNode, new Vector2D(0, -120));
 		}
 	}
 }

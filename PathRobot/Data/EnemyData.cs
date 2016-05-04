@@ -60,6 +60,10 @@ namespace HomeExam
 						robot.Y + Distance * Math.Cos(b));
 				}
 				CurrentNode = collisionMap.GetNode(Position, true);
+				if (CurrentNode != PreviousNode)
+				{
+					robot.OnEnemyMovedNode();
+				}
 			}
 			else
 			{
