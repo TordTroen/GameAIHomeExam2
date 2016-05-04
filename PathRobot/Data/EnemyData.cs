@@ -8,17 +8,16 @@ namespace HomeExam
 {
 	public class EnemyData
 	{
-		public double Bearing { get; set; }
-		public double BearingRadians { get; set; }
-		public double Heading { get; set; }
-		public double Distance { get; set; }
-		public double Velocity { get; set; }
-		public long UpdateTime { get; set; } // The time we last set this data
-		public Vector2D Position { get; set; }
-		public Vector2D LastPosition { get; set; }
-		public MapNode CurrentNode { get; set; }
+		public double Bearing { get; private set; }
+		public double BearingRadians { get; private set; }
+		public double Heading { get; private set; }
+		public double Distance { get; private set; }
+		public double Velocity { get; private set; }
+		public long UpdateTime { get; private set; } // The time we last set this data
+		public Vector2D Position { get; private set; }
+		public Vector2D LastPosition { get; private set; }
+		public MapNode CurrentNode { get; private set; }
 		private MapNode PreviousNode { get; set; }
-		public bool EnteredNewNode { get { return CurrentNode != PreviousNode; } }
 
 		private readonly Trotor14MechaGodzilla robot;
 		private readonly CollisionMap collisionMap;
@@ -59,8 +58,9 @@ namespace HomeExam
 						robot.X + Distance * Math.Sin(b),
 						robot.Y + Distance * Math.Cos(b));
 				}
+
 				CurrentNode = collisionMap.GetNode(Position, true);
-				if (CurrentNode != PreviousNode)
+				if (/*CurrentNode != PreviousNode && */Velocity <= 0.01)
 				{
 					robot.OnEnemyMovedNode();
 				}

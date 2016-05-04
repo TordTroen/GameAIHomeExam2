@@ -14,8 +14,8 @@ namespace PG4500_2016_Exam2
     public class Trotor14MechaGodzilla : AdvancedRobot
     {
 		public const double Mass = 0.01;
-		public const double MaxSpeed = 6;
-		private const double TargetNodeDistance = 54;
+		public const double MaxSpeed = 8;
+		private const double TargetNodeDistance = 36;
 
 		public Vector2D Position { get; private set; }
 		public Vector2D VelocityVector
@@ -42,6 +42,7 @@ namespace PG4500_2016_Exam2
 		private CollisionMap collisionMap;
 		private AStarSearch aStarSearch;
 		private Stack<MapNode> nodePath;
+		private bool hasReachedStartPosition = false;
 
 		public override void Run()
 		{
@@ -60,7 +61,7 @@ namespace PG4500_2016_Exam2
 			////nodePath = aStarSearch.Search(CurrentNode, goalNode);
 			//TargetNode = collisionMap.GetNode(0, 0, false);
 			//goalNode = collisionMap.GetNode(15, 4, false);
-			
+
 			////SetGoalNode(b);
 			//nodePath = aStarSearch.Search(TargetNode, goalNode);
 			//Out.WriteLine("======================");
@@ -71,42 +72,29 @@ namespace PG4500_2016_Exam2
 			//}
 			//Out.WriteLine("======================");
 
+			UpdateBot();
+
+			// Initially start going to [25, 25]
+			var startingNode = collisionMap.GetNode(new Vector2D(25, 25), false);
+			SetGoalNode(startingNode);
 
 			while (true)
 			{
 				UpdateBot();
 
-				//if (enemyData.EnteredNewNode)
+				// Check if we have reached the initial starting position
+				if (!hasReachedStartPosition && Position.Distance(startingNode.PhysicalPosition) < TargetNodeDistance)
 				{
-					//SetGoalNode(enemyData.CurrentNode);
-
-					//goalNode = enemyData.CurrentNode;
-					//if (collisionMap.obstacles.Contains(goalNode))
-					//{
-					//	var possibleNodes = goalNode.Neighbours.Except(collisionMap.obstacles).ToList();
-					//	if (possibleNodes.Count > 0)
-					//	{
-					//		goalNode = possibleNodes[0];
-					//	}
-					//}
-					//TargetNode = null;
-					//nodePath = aStarSearch.Search(CurrentNode, goalNode);
-				}
-				//var enemyNode = collisionMap.GetNode(enemyData.Position, true);
-				//if (enemyNode != null)
-				//{
-				//	SetGoalNode(enemyNode);
-				//}
-				if (enemyData.CurrentNode != null)
-				{
-					//SetGoalNode(enemyData.CurrentNode);
+					hasReachedStartPosition = true;
 				}
 
+				// Check if we have reached the targetnode
 				bool reachedTargetNode = CurrentNode == TargetNode;
-				if (TargetNode != null)
+				if (reachedTargetNode == false && TargetNode != null)
 				{
 					reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
 				}
+
 				if (GoalNode != null && (reachedTargetNode || TargetNode == null))
 				{
 					if (nodePath != null && nodePath.Count > 0)
@@ -169,10 +157,15 @@ namespace PG4500_2016_Exam2
 			nodePath = aStarSearch.Search(CurrentNode, GoalNode);
 		}
 
+		/// <summary>
+		/// Called when the enemy moved to a new node
+		/// </summary>
 		public void OnEnemyMovedNode()
 		{
-			Print("Enemy moved");
-			SetGoalNode(enemyData.CurrentNode);
+			if (hasReachedStartPosition && nodePath.Count <= 0)
+			{
+				SetGoalNode(enemyData.CurrentNode);
+			}
 		}
 
 		/// <summary>
