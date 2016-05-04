@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HomeExam.SteeringBehavior;
+using HomeExam.Helpers;
 
 namespace HomeExam.States
 {
 	public class DriverStateChaseTarget : State
 	{
-		private SeekBehaviour seek;
+		private ArrivalBehavior seek;
 
 		public override void OnStart()
 		{
-			seek = new SeekBehaviour(robot);
+			seek = new ArrivalBehavior(robot, 0);
 		}
 
 
@@ -25,6 +26,13 @@ namespace HomeExam.States
 			if (robot.TargetNode != null)
 			{
 				seek.Steer(robot.TargetNode.PhysicalPosition);
+
+				//Vector2D targetPos = robot.TargetNode.PhysicalPosition;
+
+				//double angle = Vector2D.RotationAngleFromVectors(robot.Position, targetPos, robot.Heading);
+
+				//robot.SetAhead(4);
+				//robot.SetTurnRight(angle * 1000);
 			}
 
 			return ret;

@@ -13,8 +13,8 @@ namespace PG4500_2016_Exam2
 {
     public class Trotor14MechaGodzilla : AdvancedRobot
     {
-		public const double Mass = .1;
-		public const double MaxSpeed = 80;
+		public const double Mass = 0.01;
+		public const double MaxSpeed = 6;
 
 		public Vector2D Position { get; private set; }
 		public Vector2D VelocityVector
@@ -94,17 +94,18 @@ namespace PG4500_2016_Exam2
 					//nodePath = aStarSearch.Search(CurrentNode, goalNode);
 				}
 
-				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode || TargetNode.Neighbours.Contains(CurrentNode)))
+				if (goalNode != null && (TargetNode == null || TargetNode == CurrentNode))// || TargetNode.Neighbours.Contains(CurrentNode)))
 				{
 					if (nodePath != null && nodePath.Count > 0)
 					{
+						var node = nodePath.Peek();
 						TargetNode = nodePath.Pop();
-						//Out.WriteLine("New targetnode is: " + TargetNode);
+						Out.WriteLine("New targetnode is: " + TargetNode + "(" + node + ")");
 					}
 					else
 					{
 						TargetNode = null;
-						//Out.WriteLine("Targetnode is null");
+						Out.WriteLine("Targetnode is null");
 					}
 				}
 
