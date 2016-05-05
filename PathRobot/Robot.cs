@@ -29,8 +29,8 @@ namespace PG4500_2016_Exam2
 				return new Vector2D(Velocity * Math.Cos(HeadingRadians), Velocity * Math.Sin(HeadingRadians));
 			}
 		}
-		private MapNode CurrentNode { get; set; }
 		public MapNode TargetNode { get; private set; }
+		private MapNode CurrentNode { get; set; }
 		private MapNode GoalNode { get; set; }
 
 		public Drawing Drawing { get; private set; }
@@ -257,9 +257,9 @@ namespace PG4500_2016_Exam2
 			//	}
 			//}
 
-			Drawing.DrawString(Color.Black, "Driver          : " + driverFSM.CurrentStateID, new Vector2D(0, -20));
-			Drawing.DrawString(Color.Black, "Commander : " + commanderFSM.CurrentStateID, new Vector2D(0, -40));
-			Drawing.DrawString(Color.Black, "Radar           : " + radarFSM.CurrentStateID, new Vector2D(0, -60));
+			Drawing.DrawString(Color.Black, "Driver: " + driverFSM.CurrentStateID, new Vector2D(0, -20));
+			Drawing.DrawString(Color.Black, "Commander: " + commanderFSM.CurrentStateID, new Vector2D(0, -40));
+			Drawing.DrawString(Color.Black, "Radar: " + radarFSM.CurrentStateID, new Vector2D(0, -60));
 			Drawing.DrawString(Color.Black, "CurrentNode: " + CurrentNode, new Vector2D(0, -80));
 			Drawing.DrawString(Color.Black, "TargetNode: " + TargetNode, new Vector2D(0, -100));
 			Drawing.DrawString(Color.Black, "GoalNode: " + GoalNode, new Vector2D(0, -120));

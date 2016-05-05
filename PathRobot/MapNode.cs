@@ -12,14 +12,13 @@ namespace HomeExam
 		public int X { get; private set; }
 		public int Y { get; private set; }
 		public List<MapNode> Neighbours { get; set; }
-		public MapNode CameFrom { get; set; }
-		public double Score { get; set; }
 		public Vector2D PhysicalPosition { get; private set; }
 
 		public double G { get; set; }
 		public double H { get; set; }
 		public double F { get; set; }
 		public MapNode Parent { get; set; }
+		public bool IsClosed { get; set; } = false;
 
 		public MapNode(int x, int y)
 		{
@@ -33,11 +32,6 @@ namespace HomeExam
 		{
 			return X >= 0 && X < CollisionMap.Width && Y >= 0 && Y < CollisionMap.Height;
 		}
-
-		//public Vector2D GetPhysicalPosition()
-		//{
-		//	return new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize/2, CollisionMap.NodeSize/2);
-		//}
 
 		public override bool Equals(object obj)
 		{

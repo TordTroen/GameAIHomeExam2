@@ -17,7 +17,6 @@ namespace HomeExam
 		public Vector2D Position { get; private set; }
 		public Vector2D LastPosition { get; private set; }
 		public MapNode CurrentNode { get; private set; }
-		private MapNode PreviousNode { get; set; }
 
 		private readonly Trotor14MechaGodzilla robot;
 		private readonly CollisionMap collisionMap;
@@ -40,7 +39,6 @@ namespace HomeExam
 		public void SetData(ScannedRobotEvent scanEvnt)
 		{
 			LastPosition.Set(Position);
-			PreviousNode = CurrentNode;
 
 			if (scanEvnt != null)
 			{
@@ -60,7 +58,7 @@ namespace HomeExam
 				}
 
 				CurrentNode = collisionMap.GetNode(Position, true);
-				if (/*CurrentNode != PreviousNode && */Velocity <= 0.01)
+				if (Velocity <= 0.01)
 				{
 					robot.OnEnemyMovedNode();
 				}
