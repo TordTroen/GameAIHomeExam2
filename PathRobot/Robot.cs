@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Robocode;
+using Robocode.Util;
 using HomeExam;
 using HomeExam.States;
 using HomeExam.Helpers;
@@ -43,7 +44,8 @@ namespace PG4500_2016_Exam2
 		private AStarSearch aStarSearch;
 		private Stack<MapNode> nodePath;
 		private bool hasReachedStartPosition = false;
-
+		double enemyHeading;
+		bool collisionCourse = false;
 		public override void Run()
 		{
 			InitializeBot();
@@ -101,13 +103,33 @@ namespace PG4500_2016_Exam2
 					{
 						var node = nodePath.Peek();
 						TargetNode = nodePath.Pop();
-						Out.WriteLine("New targetnode is: " + TargetNode + "(" + node + ")");
+						Print("New targetnode is: " + TargetNode + "(" + node + ")");
 					}
 					else
 					{
 						TargetNode = null;
-						Out.WriteLine("Targetnode is null");
+						Print("Targetnode is null");
 					}
+				}
+
+				double collisionRange = 100;
+				enemyHeading = enemyData.Heading;
+				//if (enemyData.Distance < collisionRange)
+				{
+					enemyHeading -= 180;
+					if (enemyHeading < 0)
+					{
+						enemyHeading += 360;
+					}
+					//collisionCourse = (enemyHeading.IsAngleNear(Heading, 35));
+					collisionCourse = Math.Abs(enemyData.Position.Dot(Position)) > 0.9;
+					// TODO Figure out if we are close to non-paralell? the opposite of 0 from the dot product when they are paralell
+					if (collisionCourse == true)
+					{
+						Print("Collision course!");
+					}
+
+					//Print("Collision range");
 				}
 
 				radarFSM.Update();
@@ -263,6 +285,12 @@ namespace PG4500_2016_Exam2
 			Drawing.DrawString(Color.Black, "CurrentNode: " + CurrentNode, new Vector2D(0, -80));
 			Drawing.DrawString(Color.Black, "TargetNode: " + TargetNode, new Vector2D(0, -100));
 			Drawing.DrawString(Color.Black, "GoalNode: " + GoalNode, new Vector2D(0, -120));
+
+
+			Drawing.DrawString(Color.Black, "Heading: " + Heading, new Vector2D(200, -20));
+			Drawing.DrawString(Color.Black, "RealEnemyHeading: " + enemyData.Heading, new Vector2D(200, -40));
+			Drawing.DrawString(Color.Black, "CalcEnemyHeading: " + enemyHeading, new Vector2D(200, -60));
+			Drawing.DrawString(Color.Black, "CollisionCourse: " + collisionCourse, new Vector2D(200, -80));
 		}
 	}
 }

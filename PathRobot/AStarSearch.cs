@@ -30,8 +30,8 @@ namespace HomeExam
 				{
 					continue;
 				}
-				currentCost.Add(node, double.NegativeInfinity);
-				priority.Add(node, double.NegativeInfinity);
+				currentCost.Add(node, double.PositiveInfinity);
+				priority.Add(node, double.PositiveInfinity);
 			}
 		}
 

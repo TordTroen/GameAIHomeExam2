@@ -44,6 +44,15 @@ namespace HomeExam.Helpers
 			Y = v.Y;
 		}
 
+		public double Dot(Vector2D v)
+		{
+			double dot = 0;
+			dot = X * v.X + Y * v.Y;
+			//double angle = 0;
+			//dot = Length * v.Length * Math.Cos(angle);
+			return dot;
+		}
+
 		public double Distance(Vector2D v)
 		{
 			double dx = v.X - X;
