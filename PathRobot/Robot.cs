@@ -43,6 +43,8 @@ namespace PG4500_2016_Exam2
 		private AStarSearch aStarSearch;
 		private Stack<MapNode> nodePath;
 		private bool hasReachedStartPosition = false;
+		bool collisionCourse = false;
+		double enemyHeading;
 
 		public override void Run()
 		{
@@ -127,6 +129,26 @@ namespace PG4500_2016_Exam2
 						or add the enemy's predicted path to the collision map? 
 							maybe just give it a bigger weighting so that if it blocks completly the robot can still find a path
 				*/
+				double collisionRange = 100;
+				enemyHeading = enemyData.Heading;
+				//if (enemyData.Distance < collisionRange)
+				{
+					enemyHeading -= 180;
+					if (enemyHeading < 0)
+					{
+						enemyHeading += 360;
+					}
+					//collisionCourse = (enemyHeading.IsAngleNear(Heading, 35));
+					collisionCourse = Math.Abs(enemyData.Position.Dot(Position)) > 0.9;
+					// TODO Figure out if we are close to non-paralell? the opposite of 0 from the dot product when they are paralell
+					if (collisionCourse == true)
+					{
+						Print("Collision course!");
+					}
+
+					//Print("Collision range");
+				}
+
 				radarFSM.Update();
 				driverFSM.Update();
 				commanderFSM.Update();
@@ -275,6 +297,11 @@ namespace PG4500_2016_Exam2
 			Drawing.DrawString(Color.Black, "TargetNode: " + ((TargetNode == null) ? "null" : TargetNode.ToString()), new Vector2D(0, -100));
 			Drawing.DrawString(Color.Black, "GoalNode: " + ((GoalNode == null) ? "null" : GoalNode.ToString()), new Vector2D(0, -120));
 			Drawing.DrawString(Color.Black, "NodePath: " + ((nodePath == null) ? "null" : nodePath.Count.ToString()), new Vector2D(0, -140));
+
+			Drawing.DrawString(Color.Black, "Heading: " + Heading, new Vector2D(200, -20));
+			Drawing.DrawString(Color.Black, "RealEnemyHeading: " + enemyData.Heading, new Vector2D(200, -40));
+			Drawing.DrawString(Color.Black, "CalcEnemyHeading: " + enemyHeading, new Vector2D(200, -60));
+			Drawing.DrawString(Color.Black, "CollisionCourse: " + collisionCourse, new Vector2D(200, -80));
 		}
 	}
 }
