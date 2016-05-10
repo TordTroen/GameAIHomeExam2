@@ -104,7 +104,6 @@ namespace PG4500_2016_Exam2
 							TargetNode = nodePath.Pop();
 							Out.WriteLine("New targetnode is: " + TargetNode);
 						}
-						
 					}
 				}
 				if (CurrentNode == GoalNode)
@@ -122,6 +121,12 @@ namespace PG4500_2016_Exam2
 					}
 				}
 
+				/* If enemy and player might collide
+					could check it simply by checking distance & direction (maybe "raycast" with the width of the tank)
+						either just try to turn and move around
+						or add the enemy's predicted path to the collision map? 
+							maybe just give it a bigger weighting so that if it blocks completly the robot can still find a path
+				*/
 				radarFSM.Update();
 				driverFSM.Update();
 				commanderFSM.Update();
@@ -234,6 +239,11 @@ namespace PG4500_2016_Exam2
 			if (TargetNode != null)
 			{
 				Drawing.DrawBox(Color.Pink, TargetNode.PhysicalPosition, 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+			}
+
+			if (enemyData != null && enemyData.PredictedNode != null)
+			{
+				Drawing.DrawBox(Color.Yellow, enemyData.PredictedNode.PhysicalPosition, 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 
 			if (nodePath != null)
