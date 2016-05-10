@@ -13,9 +13,9 @@ namespace PG4500_2016_Exam2
 {
     public class Trotor14MechaGodzilla : AdvancedRobot
     {
-		public const double Mass = 0.01;
+		public const double Mass = 1;
 		public const double MaxSpeed = 8;
-		private const double TargetNodeDistance = 36;
+	    private const double TargetNodeDistance = 40;
 
 		public Vector2D Position { get; private set; }
 		public Vector2D VelocityVector
@@ -95,18 +95,30 @@ namespace PG4500_2016_Exam2
 					reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
 				}
 
-				if (GoalNode != null && (reachedTargetNode || TargetNode == null))
+				if (nodePath != null && nodePath.Count > 0)
 				{
-					if (nodePath != null && nodePath.Count > 0)
+					if (GoalNode != null && (reachedTargetNode || TargetNode == null))
 					{
-						var node = nodePath.Peek();
-						TargetNode = nodePath.Pop();
-						Out.WriteLine("New targetnode is: " + TargetNode + "(" + node + ")");
+						if (nodePath != null && nodePath.Count > 0)
+						{
+							TargetNode = nodePath.Pop();
+							Out.WriteLine("New targetnode is: " + TargetNode);
+						}
+						
 					}
-					else
+				}
+				if (CurrentNode == GoalNode)
+				{
+					TargetNode = null;
+					nodePath = null;
+					GoalNode = null;
+					Out.WriteLine("No new target");
+				}
+				if ((GoalNode == null || nodePath == null) && enemyData.Velocity.IsZero())
+				{
+					if (enemyData.CurrentNode != null)
 					{
-						TargetNode = null;
-						Out.WriteLine("Targetnode is null");
+						SetGoalNode(enemyData.CurrentNode);
 					}
 				}
 
@@ -145,27 +157,16 @@ namespace PG4500_2016_Exam2
 			GoalNode = goal;// enemyData.CurrentNode;
 
 			// If the goalnode is a obstacle, use one of the neighbours that probably aren't an obstacle 
-			if (collisionMap.obstacles.Contains(GoalNode))
-			{
-				var possibleNodes = GoalNode.Neighbours.Except(collisionMap.obstacles).ToList();
-				if (possibleNodes.Count > 0)
-				{
-					GoalNode = possibleNodes[0];
-				}
-			}
+			//if (collisionMap.obstacles.Contains(GoalNode))
+			//{
+			//	var possibleNodes = GoalNode.Neighbours.Except(collisionMap.obstacles).ToList();
+			//	if (possibleNodes.Count > 0)
+			//	{
+			//		GoalNode = possibleNodes[0];
+			//	}
+			//}
 			TargetNode = null;
 			nodePath = aStarSearch.Search(CurrentNode, GoalNode);
-		}
-
-		/// <summary>
-		/// Called when the enemy moved to a new node
-		/// </summary>
-		public void OnEnemyMovedNode()
-		{
-			if (hasReachedStartPosition && nodePath.Count <= 0)
-			{
-				SetGoalNode(enemyData.CurrentNode);
-			}
 		}
 
 		/// <summary>
@@ -260,9 +261,10 @@ namespace PG4500_2016_Exam2
 			Drawing.DrawString(Color.Black, "Driver: " + driverFSM.CurrentStateID, new Vector2D(0, -20));
 			Drawing.DrawString(Color.Black, "Commander: " + commanderFSM.CurrentStateID, new Vector2D(0, -40));
 			Drawing.DrawString(Color.Black, "Radar: " + radarFSM.CurrentStateID, new Vector2D(0, -60));
-			Drawing.DrawString(Color.Black, "CurrentNode: " + CurrentNode, new Vector2D(0, -80));
-			Drawing.DrawString(Color.Black, "TargetNode: " + TargetNode, new Vector2D(0, -100));
-			Drawing.DrawString(Color.Black, "GoalNode: " + GoalNode, new Vector2D(0, -120));
+			Drawing.DrawString(Color.Black, "CurrentNode: " + ((CurrentNode == null) ? "null" : CurrentNode.ToString()), new Vector2D(0, -80));
+			Drawing.DrawString(Color.Black, "TargetNode: " + ((TargetNode == null) ? "null" : TargetNode.ToString()), new Vector2D(0, -100));
+			Drawing.DrawString(Color.Black, "GoalNode: " + ((GoalNode == null) ? "null" : GoalNode.ToString()), new Vector2D(0, -120));
+			Drawing.DrawString(Color.Black, "NodePath: " + ((nodePath == null) ? "null" : nodePath.Count.ToString()), new Vector2D(0, -140));
 		}
 	}
 }
