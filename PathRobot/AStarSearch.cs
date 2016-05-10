@@ -55,12 +55,10 @@ namespace HomeExam
 			{
 				var current = GetLowestFNode(open);
 				open.Remove(current);
-				//robot.Out.WriteLine("Node: " + current);
 
 				// If the current node is the goal we stop and recreate the path
 				if (current == goal)
 				{
-					//robot.Print("Node " + current + " is goal, creating path...");
 					return ReconstructPath(goal);
 				}
 
@@ -73,7 +71,6 @@ namespace HomeExam
 					}
 
 					neighbour.Parent = current;
-					//robot.Print("-> " + neighbour + " (" + neighbour.Parent + ")");
 
 					var newG = current.G + neighbour.PhysicalPosition.Distance(current.PhysicalPosition);
 					neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
@@ -84,15 +81,13 @@ namespace HomeExam
 						continue;
 					}
 
-					//robot.Print("Adding successor to frontier: " + neighbour);
 					open.Add(neighbour);
 					neighbour.G = newG;
-					//neighbour.F = neighbour.G + neighbour.H;
 				}
 				current.IsClosed = true;
 			}
 
-			robot.Print("Couldn't find a goal!");
+			robot.Print("Couldn't find a path!");
 			return null;
 		}
 
