@@ -18,6 +18,7 @@ namespace HomeExam.States
 		public const string StateRadarLock = "ScanLock";
 		public const string StateRadarSweep = "RadarSweep";
 		public const string StateChaseTarget = "ChaseTarget";
+		public const string StateTurnToTarget = "TurnToTarget";
 
 		private readonly Dictionary<string, State> states;
 		private readonly Trotor14MechaGodzilla robot;
@@ -32,7 +33,8 @@ namespace HomeExam.States
 				{ StateIdle, new StateIdle() },
 				{ StateRadarSweep, new RadarStateScanSweep() },
 				{ StateRadarLock, new RadarStateScanLock() },
-				{ StateChaseTarget, new DriverStateChaseTarget() }
+				{ StateChaseTarget, new DriverStateChaseTarget() },
+				{ StateTurnToTarget, new DriverStateTurnToTarget() }
 			};
 			// Initialize the states with the dictionary entry's key and a reference to the robot
 			foreach (var item in states)

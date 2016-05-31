@@ -2,6 +2,7 @@
 - If the enemy is in an obstacle node, the robot will path to one of the neighbours 
 	- that waythe robot is guaranteed have a node to path to, because in the given collision map every node has atleast one neighbour (including diagonal neighbours) is a non-obstacle node
 - I added the G, H, F, CameFrom and IsClosed to each MapNode so we don't have to keep multiple lists and check these during the search
+- I made the robot turn towards the first node in the path before starting to move towards it. This prevent the robot from taking big loops and hitting obstacles and getting somewhat stuck in the map boundaries when it starts following a new path.
 
 ### TODO
 - Use better data structures for the A*

@@ -43,6 +43,9 @@ namespace PG4500_2016_Exam2
 		private AStarSearch aStarSearch;
 		private Stack<MapNode> nodePath;
 		private bool hasReachedStartPosition = false;
+		private bool hasReachedFirstNodeInPath = false;
+
+		// Testing vars
 		bool collisionCourse = false;
 		double enemyHeading;
 
@@ -51,7 +54,7 @@ namespace PG4500_2016_Exam2
 			InitializeBot();
 			
 			radarFSM.EnqueueState(StateManager.StateRadarSweep);
-			driverFSM.EnqueueState(StateManager.StateChaseTarget);
+			driverFSM.EnqueueState(StateManager.StateTurnToTarget);
 			commanderFSM.EnqueueState(StateManager.StateIdle);
 
 			// This was used for testing the algorithm
@@ -122,6 +125,11 @@ namespace PG4500_2016_Exam2
 						SetGoalNode(enemyData.CurrentNode);
 					}
 				}
+				if (!hasReachedFirstNodeInPath && TargetNode != null)
+				{
+					driverFSM.EnqueueState(StateManager.StateTurnToTarget);
+					hasReachedFirstNodeInPath = true;
+				}
 
 				/* If enemy and player might collide
 					could check it simply by checking distance & direction (maybe "raycast" with the width of the tank)
@@ -143,7 +151,7 @@ namespace PG4500_2016_Exam2
 					// TODO Figure out if we are close to non-paralell? the opposite of 0 from the dot product when they are paralell
 					if (collisionCourse == true)
 					{
-						Print("Collision course!");
+						//Print("Collision course!");
 					}
 
 					//Print("Collision range");
@@ -194,6 +202,7 @@ namespace PG4500_2016_Exam2
 			//}
 			TargetNode = null;
 			nodePath = aStarSearch.Search(CurrentNode, GoalNode);
+			hasReachedFirstNodeInPath = false;
 		}
 
 		/// <summary>

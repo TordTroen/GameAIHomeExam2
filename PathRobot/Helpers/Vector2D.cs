@@ -15,7 +15,8 @@ namespace HomeExam.Helpers
 		public double X { get; set; }
 		public double Y { get; set; }
 
-		public double Length { get { return Math.Sqrt((X * X) + (Y * Y)); } }
+		public double Length { get { return Math.Sqrt(LengthSqr); } }
+		public double LengthSqr { get { return (X * X) + (Y * Y); } }
 
 		public Vector2D()
 		{

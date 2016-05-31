@@ -31,6 +31,11 @@ namespace HomeExam.SteeringBehavior
 
 			steering.Truncate(Trotor14MechaGodzilla.MaxSpeed);
 			steering = steering / Trotor14MechaGodzilla.Mass;
+			//if (steering.LengthSqr > Trotor14MechaGodzilla.Mass * Trotor14MechaGodzilla.Mass)
+			//{
+			//	steering.Normalize();
+			//	steering *= Trotor14MechaGodzilla.Mass;
+			//}
 
 			velocity = velocity + steering;
 			velocity.Truncate(Trotor14MechaGodzilla.MaxSpeed);
