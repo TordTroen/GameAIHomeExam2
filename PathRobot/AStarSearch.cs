@@ -72,17 +72,21 @@ namespace HomeExam
 
 					neighbour.Parent = current;
 
-					var newG = current.G + neighbour.PhysicalPosition.Distance(current.PhysicalPosition);
-					neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
-					neighbour.F = neighbour.G + neighbour.H; // TODO is this best, or is calculating F after setting G best?
+					//var newCost = (1 + neighbour.Weight) * (current.G + Heuristic(current, neighbour));
+					var heur = Heuristic(start, neighbour);
+					var newCost = (1 + neighbour.Weight) * (heur);
+					robot.Print(start + " to " + neighbour + " cost: " + newCost);
+					//neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
+					neighbour.H = Heuristic(neighbour, goal);
 
-					if (newG >= neighbour.G)
+					if (newCost < neighbour.G)
 					{
-						continue;
+						//robot.Print("Newg is more than old");
+						//continue;
+						open.Add(neighbour);
+						neighbour.G = newCost;
 					}
-
-					open.Add(neighbour);
-					neighbour.G = newG;
+					neighbour.F = neighbour.G + neighbour.H; // TODO is this best, or is calculating F after setting G best?
 				}
 				current.IsClosed = true;
 			}
@@ -91,6 +95,10 @@ namespace HomeExam
 			return null;
 		}
 
+		public double Heuristic(MapNode from, MapNode to)
+		{
+			return from.PhysicalPosition.Distance(to.PhysicalPosition) / CollisionMap.NodeSize;
+		}
 
 		private Stack<MapNode> ReconstructPath(MapNode goal)
 		{

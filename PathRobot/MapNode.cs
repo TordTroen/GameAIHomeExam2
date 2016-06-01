@@ -19,6 +19,7 @@ namespace HomeExam
 		public double F { get; set; }
 		public MapNode Parent { get; set; }
 		public bool IsClosed { get; set; } = false;
+		public double Weight { get; set; }
 
 		public MapNode(int x, int y)
 		{
@@ -64,7 +65,7 @@ namespace HomeExam
 
 		public override string ToString()
 		{
-			return string.Format("[{0}, {1}]", X, Y);
+			return string.Format("[{0}, {1}]({2})", X, Y, Weight);
 		}
 	}
 }

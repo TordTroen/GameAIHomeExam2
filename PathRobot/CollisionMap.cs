@@ -15,13 +15,14 @@ namespace HomeExam
 		public const double NodeSize = 50; // The size of each node or cell
 		public const int Width = 16; // Number of nodes across
 		public const int Height = 12; // Number of nodes down
+		private const double WallNodeWeight = double.MaxValue; // The weight of a wall node, hould be really high so we don't pass them. (shouldn't matter as those nodes aren't included in the search.
 
 		// TODO Could store the nodes in a dictionary with x,y as key for faster lookup
 		public List<MapNode> map = new List<MapNode>(); // The nodes we can move through
 		public List<MapNode> obstacles = new List<MapNode>(); // The nodes we can't move through
 
 		// The collision map we have been provided
-		private readonly int[] simpleMap =
+		private readonly int[] rawMap =
 		{
 			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0,
@@ -61,7 +62,7 @@ namespace HomeExam
 		{
 			int x = 0;
 			int y = Height-1;
-			for (int i = 0; i < simpleMap.Length; i ++)
+			for (int i = 0; i < rawMap.Length; i ++)
 			{
 				// If we have reached the end of the row, go to the next row
 				if (x >= Width)
@@ -75,13 +76,16 @@ namespace HomeExam
 				if (node.IsInsideMapBounds())
 				{
 					// Add the node to the map or the obstacles list based on what the simplemap value is
-					if (simpleMap[i] == 0)
+					if (rawMap[i] == 1)
 					{
+						//obstacles.Add(node);
 						map.Add(node);
+						node.Weight = WallNodeWeight;
 					}
 					else
 					{
-						obstacles.Add(node);
+						map.Add(node);
+						node.Weight = 0;
 					}
 				}
 				
@@ -148,20 +152,15 @@ namespace HomeExam
 
 		private List<MapNode> GetNeighbours(MapNode node)
 		{
-			//robot.Out.Write("Neighbours of " + node + ":");
 			var neighbours = new List<MapNode>();
 			foreach (var direction in PossibleNeighbours)
 			{
-				//Predicate<MapNode> nodeFinder = (MapNode n) => n.X == node.X + direction.X && n.Y == node.Y + direction.Y;
-				MapNode neighbour;// = map.Find(nodeFinder);
-				neighbour = GetNode(node.X + direction.X, node.Y + direction.Y, false);
+				MapNode neighbour = GetNode(node.X + direction.X, node.Y + direction.Y, false);
 				if (neighbour != null)
 				{
 					neighbours.Add(neighbour);
-					//robot.Out.Write(", " + neighbour);
 				}
 			}
-			//robot.Out.WriteLine();
 			return neighbours;
 		}
 

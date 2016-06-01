@@ -9,4 +9,3 @@
 	- A priority queue or a min-heap of some sort for the frontier container so we don't have to go through it at every step in the search
 
 - Avoiding enemy is cool by not necessary
-- Don't search if the enemy is in a wall
