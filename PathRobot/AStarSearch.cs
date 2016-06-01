@@ -72,13 +72,14 @@ namespace HomeExam
 
 					neighbour.Parent = current;
 
-					//var newCost = (1 + neighbour.Weight) * (current.G + Heuristic(current, neighbour));
-					var heur = Heuristic(start, neighbour);
-					var newCost = (1 + neighbour.Weight) * (heur);
+					var newCost = (1 + neighbour.Weight) * (current.G + Heuristic(current, neighbour));
+					//var heur = Heuristic(current, neighbour);
+					//var newCost = (1 + neighbour.Weight) * (current.G + heur);
 					robot.Print(start + " to " + neighbour + " cost: " + newCost);
 					//neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
 					neighbour.H = Heuristic(neighbour, goal);
 
+					neighbour.F = neighbour.G + neighbour.H; 
 					if (newCost < neighbour.G)
 					{
 						//robot.Print("Newg is more than old");
@@ -86,7 +87,6 @@ namespace HomeExam
 						open.Add(neighbour);
 						neighbour.G = newCost;
 					}
-					neighbour.F = neighbour.G + neighbour.H; // TODO is this best, or is calculating F after setting G best?
 				}
 				current.IsClosed = true;
 			}
