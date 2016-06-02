@@ -38,7 +38,7 @@ namespace HomeExam
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		};
 
-		// List of "direction" we look for neighbours in
+		// List of "direction" we look for neighbours in (can remove the last 4 to only have neighbours horizontally and vertically)
 		private readonly MapNode[] PossibleNeighbours = 
 		{
 			new MapNode(1, 0),		// Right

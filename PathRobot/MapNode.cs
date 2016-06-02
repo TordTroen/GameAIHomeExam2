@@ -11,6 +11,10 @@ namespace HomeExam
 	{
 		public int X { get; private set; }
 		public int Y { get; private set; }
+
+		/// <summary>
+		/// A list of all the neighbours of this node (obstacle nodes are excluded)
+		/// </summary>
 		public List<MapNode> Neighbours { get; set; }
 		public Vector2D PhysicalPosition { get; private set; }
 
@@ -65,7 +69,7 @@ namespace HomeExam
 
 		public override string ToString()
 		{
-			return string.Format("[{0}, {1}]({2})", X, Y, Weight);
+			return string.Format("[{0}, {1}]", X, Y);
 		}
 	}
 }
