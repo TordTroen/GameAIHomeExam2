@@ -75,17 +75,22 @@ namespace HomeExam
 				MapNode node = new MapNode(x, y);
 				if (node.IsInsideMapBounds())
 				{
+					int rawNode = rawMap[i];
 					// Add the node to the map or the obstacles list based on what the simplemap value is
-					if (rawMap[i] == 1)
+					if (rawNode == 1)
 					{
-						//obstacles.Add(node);
-						map.Add(node);
+						obstacles.Add(node);
+						//map.Add(node);
 						node.Weight = WallNodeWeight;
 					}
 					else
 					{
 						map.Add(node);
 						node.Weight = 0;
+						//if (rawNode == 2)
+						//{
+						//	node.Weight = 50;
+						//}
 					}
 				}
 				

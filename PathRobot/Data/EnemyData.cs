@@ -17,6 +17,7 @@ namespace HomeExam
 		public Vector2D Position { get; private set; }
 		public MapNode CurrentNode { get; private set; }
 		public MapNode PredictedNode { get; private set; }
+		public MapNode PrevNode { get; private set; }
 
 		private readonly Trotor14MechaGodzilla robot;
 		private readonly CollisionMap collisionMap;
@@ -37,6 +38,8 @@ namespace HomeExam
 
 		public void SetData(ScannedRobotEvent scanEvnt)
 		{
+			PrevNode = CurrentNode;
+
 			if (scanEvnt != null)
 			{
 				Bearing = scanEvnt.Bearing;
@@ -51,9 +54,9 @@ namespace HomeExam
 					double b = robot.HeadingRadians + scanEvnt.BearingRadians;
 					Position.Set( robot.X + Distance * Math.Sin(b), robot.Y + Distance * Math.Cos(b));
 
-					double time = Distance / Trotor14MechaGodzilla.MaxSpeed;
+					double time = Distance / Velocity;
 					Vector2D futurePos = GetFuturePosition(time);
-					
+					futurePos.Clamp(25, 25, robot.BattleFieldWidth-25, robot.BattleFieldHeight-25);
 					PredictedNode = collisionMap.GetNode(futurePos, true);
 				}
 

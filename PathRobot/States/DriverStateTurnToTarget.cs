@@ -12,8 +12,12 @@ namespace HomeExam.States
 	{
 		public override string OnUpdate()
 		{
-			double angle = Vector2D.RotationAngleFromVectors(robot.Position, robot.TargetNode.PhysicalPosition, robot.Heading);
-			robot.SetTurnRight(angle);
+			double angle = 0;
+			if (robot.TargetNode != null)
+			{
+				angle = Vector2D.RotationAngleFromVectors(robot.Position, robot.TargetNode.PhysicalPosition, robot.Heading);
+				robot.SetTurnRight(angle);
+			}
 
 			if (angle.IsZero())
 			{

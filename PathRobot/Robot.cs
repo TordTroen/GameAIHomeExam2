@@ -131,31 +131,97 @@ namespace PG4500_2016_Exam2
 					hasReachedFirstNodeInPath = true;
 				}
 
+				//////// Repathing and accounting for the enemy position
+				//if (enemyData.Distance < CollisionMap.NodeSize * 4)
+				//{
+				//	Print("Predicted moved");
+				//	if (enemyData.PrevNode != null)
+				//	{
+				//		enemyData.PrevNode.Weight = 0;
+				//		foreach (var node in enemyData.PrevNode.Neighbours)
+				//		{
+				//			node.Weight = 0;
+				//			foreach (var node2 in node.Neighbours)
+				//			{
+				//				node2.Weight = 0;
+				//			}
+				//		}
+				//	}
+				//	if (enemyData.CurrentNode != null)
+				//	{
+				//		const double enemyNodeWeight = 2;
+				//		enemyData.CurrentNode.Weight = enemyNodeWeight;
+				//		foreach (var node in enemyData.CurrentNode.Neighbours)
+				//		{
+				//			node.Weight = enemyNodeWeight;
+				//			foreach (var node2 in node.Neighbours)
+				//			{
+				//				node2.Weight = enemyNodeWeight;
+				//			}
+				//		}
+				//	}
+				//	if (GoalNode != null && TargetNode != null)
+				//	{
+				//		//SetGoalNode(GoalNode);
+				//		//TargetNode = null;
+				//		//nodePath = aStarSearch.Search(TargetNode, GoalNode);
+				//		//TargetNode = nodePath.Pop();
+				//	}
+				//}
+
+				//////// Repathing and accounting for the enemy predicted position (this moved through obstacles
+				//if (enemyData.PredictedNode != enemyData.PrevPredictedNode && enemyData.Distance < CollisionMap.NodeSize * 30)
+				//{
+				//	Print("Predicted moved");
+				//	if (enemyData.PrevPredictedNode != null)
+				//	{
+				//		enemyData.PrevPredictedNode.Weight = 0;
+				//		foreach (var node in enemyData.PrevPredictedNode.Neighbours)
+				//		{
+				//			node.Weight = 0;
+				//		}
+				//	}
+				//	if (enemyData.PredictedNode != null)
+				//	{
+				//		enemyData.PredictedNode.Weight = 10;
+				//		foreach (var node in enemyData.PredictedNode.Neighbours)
+				//		{
+				//			node.Weight = 10;
+				//		}
+				//	}
+				//	if (GoalNode != null)
+				//	{
+				//		//SetGoalNode(GoalNode);
+				//		nodePath = aStarSearch.Search(CurrentNode, GoalNode);
+				//	}
+				//}
+
+				//////// Trying to figure out if we are about to collide
 				/* If enemy and player might collide
 					could check it simply by checking distance & direction (maybe "raycast" with the width of the tank)
 						either just try to turn and move around
 						or add the enemy's predicted path to the collision map? 
 							maybe just give it a bigger weighting so that if it blocks completly the robot can still find a path
 				*/
-				double collisionRange = 100;
-				enemyHeading = enemyData.Heading;
-				//if (enemyData.Distance < collisionRange)
-				{
-					enemyHeading -= 180;
-					if (enemyHeading < 0)
-					{
-						enemyHeading += 360;
-					}
-					//collisionCourse = (enemyHeading.IsAngleNear(Heading, 35));
-					collisionCourse = Math.Abs(enemyData.Position.Dot(Position)) > 0.9;
-					// TODO Figure out if we are close to non-paralell? the opposite of 0 from the dot product when they are paralell
-					if (collisionCourse == true)
-					{
-						//Print("Collision course!");
-					}
+				//double collisionRange = 100;
+				//enemyHeading = enemyData.Heading;
+				////if (enemyData.Distance < collisionRange)
+				//{
+				//	enemyHeading -= 180;
+				//	if (enemyHeading < 0)
+				//	{
+				//		enemyHeading += 360;
+				//	}
+				//	//collisionCourse = (enemyHeading.IsAngleNear(Heading, 35));
+				//	collisionCourse = Math.Abs(enemyData.Position.Dot(Position)) > 0.9;
+				//	// TODO Figure out if we are close to non-paralell? the opposite of 0 from the dot product when they are paralell
+				//	if (collisionCourse == true)
+				//	{
+				//		//Print("Collision course!");
+				//	}
 
-					//Print("Collision range");
-				}
+				//	//Print("Collision range");
+				//}
 
 				radarFSM.Update();
 				driverFSM.Update();

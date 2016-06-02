@@ -64,8 +64,8 @@ namespace HomeExam.Helpers
 		public Vector2D ProjectForTime(double headingRadians, double velocity, double time)
 		{
 			return new Vector2D(
-				X + (Math.Sin(headingRadians) * velocity * time),
-				Y + (Math.Cos(headingRadians) * velocity * time));
+				X + velocity * Math.Sin(headingRadians) * time,
+				Y + velocity * Math.Cos(headingRadians) * time);
 		}
 
 		public void Clamp(double xMin, double yMin, double xMax, double yMax)

@@ -79,7 +79,7 @@ namespace HomeExam
 					//neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
 					neighbour.H = Heuristic(neighbour, goal);
 
-					neighbour.F = neighbour.G + neighbour.H; 
+					neighbour.F = neighbour.G + neighbour.H;
 					if (newCost < neighbour.G)
 					{
 						//robot.Print("Newg is more than old");
@@ -97,7 +97,7 @@ namespace HomeExam
 
 		public double Heuristic(MapNode from, MapNode to)
 		{
-			return from.PhysicalPosition.Distance(to.PhysicalPosition) / CollisionMap.NodeSize;
+			return from.PhysicalPosition.Distance(to.PhysicalPosition);
 		}
 
 		private Stack<MapNode> ReconstructPath(MapNode goal)
