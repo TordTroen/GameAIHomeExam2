@@ -17,6 +17,11 @@ namespace PG4500_2016_Exam2
 		public const double MaxSpeed = 8;
 	    private const double TargetNodeDistance = 40;
 
+		public const long CollisionAvoidanceDuration = 16; // Turns before we continue the normal movement
+		public const double CollisionAvoidanceDistance = CollisionMap.NodeSize * 4; // Distance to the enemy where we stop for a while
+		public const double CollisionAvoidanceSpeed = 1; // Speed when we are slowing down when trying to avoid collision
+		public double CurrentSpeed { get; private set; }
+
 		public Vector2D Position { get; private set; }
 		public Vector2D VelocityVector
 		{
@@ -44,10 +49,12 @@ namespace PG4500_2016_Exam2
 		private Stack<MapNode> nodePath;
 		private bool hasReachedStartPosition = false;
 		private bool hasReachedFirstNodeInPath = false;
+		private MapNode startingNode;
 
 		// Testing vars
 		bool collisionCourse = false;
 		double enemyHeading;
+		MapNode prevLocked;
 
 		public override void Run()
 		{
@@ -80,56 +87,68 @@ namespace PG4500_2016_Exam2
 			UpdateBot();
 
 			// Initially start going to [25, 25]
-			var startingNode = collisionMap.GetNode(new Vector2D(25, 25), false);
+			startingNode = collisionMap.GetNode(new Vector2D(25, 25), false);
 			SetGoalNode(startingNode);
+
+			// Test var
+			long resetStartTime = -1;
 
 			while (true)
 			{
 				UpdateBot();
 
-				// Check if we have reached the initial starting position
-				if (!hasReachedStartPosition && Position.Distance(startingNode.PhysicalPosition) < TargetNodeDistance)
-				{
-					hasReachedStartPosition = true;
-				}
+				FollowPath();
 
-				// Check if we have reached the targetnode
-				bool reachedTargetNode = CurrentNode == TargetNode;
-				if (reachedTargetNode == false && TargetNode != null)
+				//////// Trying to avoid the predicted
+				if (enemyData.PredictedNode != null)
 				{
-					reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
-				}
-
-				if (nodePath != null && nodePath.Count > 0)
-				{
-					if (GoalNode != null && (reachedTargetNode || TargetNode == null))
+					if (nodePath.Contains(enemyData.PredictedNode))
 					{
-						if (nodePath != null && nodePath.Count > 0)
+						Print("---------------- Path contains predicted ----------------");
+						// TODO Include neighbours of that node
+						if (prevLocked != null)
 						{
-							TargetNode = nodePath.Pop();
-							Out.WriteLine("New targetnode is: " + TargetNode);
+							prevLocked.IsLocked = false;
 						}
+						enemyData.PredictedNode.IsLocked = true;
+						prevLocked = enemyData.PredictedNode;
+
+						nodePath = aStarSearch.Search(TargetNode, GoalNode);
 					}
 				}
-				if (CurrentNode == GoalNode)
-				{
-					TargetNode = null;
-					nodePath = null;
-					GoalNode = null;
-					Out.WriteLine("No new target");
-				}
-				if ((GoalNode == null || nodePath == null) && enemyData.Velocity.IsZero())
-				{
-					if (enemyData.CurrentNode != null)
-					{
-						SetGoalNode(enemyData.CurrentNode);
-					}
-				}
-				if (!hasReachedFirstNodeInPath && TargetNode != null)
-				{
-					driverFSM.EnqueueState(StateManager.StateTurnToTarget);
-					hasReachedFirstNodeInPath = true;
-				}
+
+
+				//////// Slowing down/stopping
+				//if (enemyData.PredictedNode != null)
+				//{
+				//	if (enemyData.PredictedNode == TargetNode || (nodePath != null && nodePath.Contains(enemyData.PredictedNode)))
+				//	{
+				//		Print("----------------------- Predicted node is TargetNode or Path! -----------------------");
+				//		// TODO Slow down
+				//		CurrentSpeed = CollisionAvoidanceSpeed;
+				//		//resetStartTime = Time;
+				//	}
+				//	else if (resetStartTime == -1)
+				//	{
+				//		CurrentSpeed = MaxSpeed;
+				//	}
+				//}
+				//if (resetStartTime == -1 && enemyData.Distance < CollisionAvoidanceDistance)
+				//{
+				//	// TODO Stop
+				//	Print("----------------------- To close for comfort! -----------------------");
+				//	CurrentSpeed = 0.1;
+				//	resetStartTime = Time;
+				//}
+				//if (resetStartTime != -1)
+				//{
+				//	Print("Reset:" + resetStartTime + ", Time: " + Time);
+				//	if (Time - resetStartTime > CollisionAvoidanceDuration)
+				//	{
+				//		CurrentSpeed = MaxSpeed;
+				//		resetStartTime = -1;
+				//	}
+				//}
 
 				//////// Repathing and accounting for the enemy position
 				//if (enemyData.Distance < CollisionMap.NodeSize * 4)
@@ -246,6 +265,55 @@ namespace PG4500_2016_Exam2
 			IsAdjustRadarForGunTurn = false;
 			IsAdjustGunForRobotTurn = false;
 			IsAdjustRadarForRobotTurn = false;
+			CurrentSpeed = MaxSpeed;
+		}
+
+		private void FollowPath()
+		{
+			// Check if we have reached the initial starting position
+			if (!hasReachedStartPosition && Position.Distance(startingNode.PhysicalPosition) < TargetNodeDistance)
+			{
+				hasReachedStartPosition = true;
+			}
+
+			// Check if we have reached the targetnode, and if so pop a node from the path, and set that as the target
+			bool reachedTargetNode = CurrentNode == TargetNode;
+			if (reachedTargetNode == false && TargetNode != null)
+			{
+				reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
+			}
+			if (nodePath != null && nodePath.Count > 0)
+			{
+				if (GoalNode != null && (reachedTargetNode || TargetNode == null))
+				{
+					if (nodePath != null && nodePath.Count > 0)
+					{
+						TargetNode = nodePath.Pop();
+						Out.WriteLine("New targetnode is: " + TargetNode);
+					}
+				}
+			}
+			if (CurrentNode == GoalNode)
+			{
+				TargetNode = null;
+				nodePath = null;
+				GoalNode = null;
+				Out.WriteLine("No new target");
+			}
+
+			// Path to where the enemy stopped if we aren't already pathing
+			if ((GoalNode == null || nodePath == null) && enemyData.Velocity.IsZero())
+			{
+				if (enemyData.CurrentNode != null)
+				{
+					SetGoalNode(enemyData.CurrentNode);
+				}
+			}
+			if (!hasReachedFirstNodeInPath && TargetNode != null)
+			{
+				driverFSM.EnqueueState(StateManager.StateTurnToTarget);
+				hasReachedFirstNodeInPath = true;
+			}
 		}
 
 	    private void SetGoalNode(MapNode goal)
@@ -377,6 +445,8 @@ namespace PG4500_2016_Exam2
 			Drawing.DrawString(Color.Black, "RealEnemyHeading: " + enemyData.Heading, new Vector2D(200, -40));
 			Drawing.DrawString(Color.Black, "CalcEnemyHeading: " + enemyHeading, new Vector2D(200, -60));
 			Drawing.DrawString(Color.Black, "CollisionCourse: " + collisionCourse, new Vector2D(200, -80));
+			Drawing.DrawString(Color.Black, "Distance: " + enemyData.Distance, new Vector2D(200, -100));
+			Drawing.DrawString(Color.Black, "Speed: " + CurrentSpeed, new Vector2D(200, -120));
 		}
 	}
 }

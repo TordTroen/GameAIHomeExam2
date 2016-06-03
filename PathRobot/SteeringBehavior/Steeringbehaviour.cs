@@ -38,7 +38,7 @@ namespace HomeExam.SteeringBehavior
 			//}
 
 			velocity = velocity + steering;
-			velocity.Truncate(Trotor14MechaGodzilla.MaxSpeed);
+			velocity.Truncate(robot.CurrentSpeed);
 
 			Vector2D pos = curPos + velocity;
 

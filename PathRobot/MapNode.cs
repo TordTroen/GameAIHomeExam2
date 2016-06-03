@@ -23,6 +23,7 @@ namespace HomeExam
 		public double F { get; set; }
 		public MapNode Parent { get; set; }
 		public bool IsClosed { get; set; } = false;
+		public bool IsLocked { get; set; } = false;
 		public double Weight { get; set; }
 
 		public MapNode(int x, int y)

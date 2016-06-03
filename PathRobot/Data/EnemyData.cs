@@ -56,7 +56,7 @@ namespace HomeExam
 
 					double time = Distance / Velocity;
 					Vector2D futurePos = GetFuturePosition(time);
-					futurePos.Clamp(25, 25, robot.BattleFieldWidth-25, robot.BattleFieldHeight-25);
+					//futurePos.Clamp(25, 25, robot.BattleFieldWidth-25, robot.BattleFieldHeight-25);
 					PredictedNode = collisionMap.GetNode(futurePos, true);
 				}
 

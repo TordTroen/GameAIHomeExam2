@@ -30,7 +30,7 @@ namespace HomeExam.SteeringBehavior
 			{
 				slowdownFactor = dist / slowdownRadius;
 			}
-			Vector2D desiredVelocity = (Vector2D.Normalize(targetPos - curPos) * Trotor14MechaGodzilla.MaxSpeed) * slowdownFactor;
+			Vector2D desiredVelocity = (Vector2D.Normalize(targetPos - curPos) * robot.CurrentSpeed) * slowdownFactor;
 
 			ApplySteering(desiredVelocity, robot.VelocityVector);
 		}

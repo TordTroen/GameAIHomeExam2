@@ -49,7 +49,7 @@ namespace HomeExam
 				foreach (var neighbour in current.Neighbours)
 				{
 					// Skip this neighbour if the parent is already set or the neibour has already been processed 
-					if (neighbour.Parent != null || neighbour.IsClosed)
+					if (neighbour.Parent != null || neighbour.IsClosed || neighbour.IsLocked)
 					{
 						continue;
 					}
