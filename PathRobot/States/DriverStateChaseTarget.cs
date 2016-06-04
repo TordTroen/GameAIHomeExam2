@@ -10,22 +10,27 @@ namespace HomeExam.States
 {
 	public class DriverStateChaseTarget : State
 	{
-		private ArrivalBehavior seek;
+		private SeekBehaviour seek;
 
 		public override void OnStart()
 		{
-			seek = new ArrivalBehavior(robot, 0);
+			seek = new SeekBehaviour(robot);
 		}
-
 
 		public override string OnUpdate()
 		{
 			string ret = base.OnUpdate();
 
 			//seek.Steer(robot.TargetNode.PhysicalPosition);
-			if (robot.TargetNode != null)
+			if (robot.TargetPosition != null)
 			{
-				seek.Steer(robot.TargetNode.PhysicalPosition);
+				//Vector2D targetPosition = robot.TargetNode.PhysicalPosition;
+				//if (robot.NextTargetNode != null)
+				//{
+				//	targetPosition = (robot.TargetNode.PhysicalPosition + robot.NextTargetNode.PhysicalPosition) * 0.5;
+				//}
+				//seek.Steer(targetPosition);
+				seek.Steer(robot.TargetPosition);
 
 				//Vector2D targetPos = robot.TargetNode.PhysicalPosition;
 

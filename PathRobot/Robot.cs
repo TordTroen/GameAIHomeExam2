@@ -11,11 +11,11 @@ using System.Drawing;
 
 namespace PG4500_2016_Exam2
 {
-    public class Trotor14MechaGodzilla : AdvancedRobot
-    {
+	public class Trotor14MechaGodzilla : AdvancedRobot
+	{
 		public const double Mass = 1;
 		public const double MaxSpeed = 8;
-	    private const double TargetNodeDistance = 40;
+		private const double TargetNodeDistance = 30;
 
 		public const long CollisionAvoidanceDuration = 16; // Turns before we continue the normal movement
 		public const double CollisionAvoidanceDistance = CollisionMap.NodeSize * 4; // Distance to the enemy where we stop for a while
@@ -35,6 +35,9 @@ namespace PG4500_2016_Exam2
 			}
 		}
 		public MapNode TargetNode { get; private set; }
+		public MapNode NextTargetNode { get; private set; }
+		public Vector2D TargetPosition { get; private set; }
+		private bool targetPosIsNode = true;
 		private MapNode CurrentNode { get; set; }
 		private MapNode GoalNode { get; set; }
 
@@ -43,7 +46,6 @@ namespace PG4500_2016_Exam2
 
 		private FiniteStateMachine radarFSM;
 		private FiniteStateMachine driverFSM;
-		private FiniteStateMachine commanderFSM;
 		private CollisionMap collisionMap;
 		private AStarSearch aStarSearch;
 		private Stack<MapNode> nodePath;
@@ -62,7 +64,6 @@ namespace PG4500_2016_Exam2
 			
 			radarFSM.EnqueueState(StateManager.StateRadarSweep);
 			driverFSM.EnqueueState(StateManager.StateTurnToTarget);
-			commanderFSM.EnqueueState(StateManager.StateIdle);
 
 			// This was used for testing the algorithm
 			////startNode = collisionMap.GetNode(0, 10, false);
@@ -99,152 +100,10 @@ namespace PG4500_2016_Exam2
 
 				FollowPath();
 
-				//////// Trying to avoid the predicted
-				if (enemyData.PredictedNode != null)
-				{
-					if (nodePath.Contains(enemyData.PredictedNode))
-					{
-						Print("---------------- Path contains predicted ----------------");
-						// TODO Include neighbours of that node
-						if (prevLocked != null)
-						{
-							prevLocked.IsLocked = false;
-						}
-						enemyData.PredictedNode.IsLocked = true;
-						prevLocked = enemyData.PredictedNode;
-
-						nodePath = aStarSearch.Search(TargetNode, GoalNode);
-					}
-				}
-
-
-				//////// Slowing down/stopping
-				//if (enemyData.PredictedNode != null)
-				//{
-				//	if (enemyData.PredictedNode == TargetNode || (nodePath != null && nodePath.Contains(enemyData.PredictedNode)))
-				//	{
-				//		Print("----------------------- Predicted node is TargetNode or Path! -----------------------");
-				//		// TODO Slow down
-				//		CurrentSpeed = CollisionAvoidanceSpeed;
-				//		//resetStartTime = Time;
-				//	}
-				//	else if (resetStartTime == -1)
-				//	{
-				//		CurrentSpeed = MaxSpeed;
-				//	}
-				//}
-				//if (resetStartTime == -1 && enemyData.Distance < CollisionAvoidanceDistance)
-				//{
-				//	// TODO Stop
-				//	Print("----------------------- To close for comfort! -----------------------");
-				//	CurrentSpeed = 0.1;
-				//	resetStartTime = Time;
-				//}
-				//if (resetStartTime != -1)
-				//{
-				//	Print("Reset:" + resetStartTime + ", Time: " + Time);
-				//	if (Time - resetStartTime > CollisionAvoidanceDuration)
-				//	{
-				//		CurrentSpeed = MaxSpeed;
-				//		resetStartTime = -1;
-				//	}
-				//}
-
-				//////// Repathing and accounting for the enemy position
-				//if (enemyData.Distance < CollisionMap.NodeSize * 4)
-				//{
-				//	Print("Predicted moved");
-				//	if (enemyData.PrevNode != null)
-				//	{
-				//		enemyData.PrevNode.Weight = 0;
-				//		foreach (var node in enemyData.PrevNode.Neighbours)
-				//		{
-				//			node.Weight = 0;
-				//			foreach (var node2 in node.Neighbours)
-				//			{
-				//				node2.Weight = 0;
-				//			}
-				//		}
-				//	}
-				//	if (enemyData.CurrentNode != null)
-				//	{
-				//		const double enemyNodeWeight = 2;
-				//		enemyData.CurrentNode.Weight = enemyNodeWeight;
-				//		foreach (var node in enemyData.CurrentNode.Neighbours)
-				//		{
-				//			node.Weight = enemyNodeWeight;
-				//			foreach (var node2 in node.Neighbours)
-				//			{
-				//				node2.Weight = enemyNodeWeight;
-				//			}
-				//		}
-				//	}
-				//	if (GoalNode != null && TargetNode != null)
-				//	{
-				//		//SetGoalNode(GoalNode);
-				//		//TargetNode = null;
-				//		//nodePath = aStarSearch.Search(TargetNode, GoalNode);
-				//		//TargetNode = nodePath.Pop();
-				//	}
-				//}
-
-				//////// Repathing and accounting for the enemy predicted position (this moved through obstacles
-				//if (enemyData.PredictedNode != enemyData.PrevPredictedNode && enemyData.Distance < CollisionMap.NodeSize * 30)
-				//{
-				//	Print("Predicted moved");
-				//	if (enemyData.PrevPredictedNode != null)
-				//	{
-				//		enemyData.PrevPredictedNode.Weight = 0;
-				//		foreach (var node in enemyData.PrevPredictedNode.Neighbours)
-				//		{
-				//			node.Weight = 0;
-				//		}
-				//	}
-				//	if (enemyData.PredictedNode != null)
-				//	{
-				//		enemyData.PredictedNode.Weight = 10;
-				//		foreach (var node in enemyData.PredictedNode.Neighbours)
-				//		{
-				//			node.Weight = 10;
-				//		}
-				//	}
-				//	if (GoalNode != null)
-				//	{
-				//		//SetGoalNode(GoalNode);
-				//		nodePath = aStarSearch.Search(CurrentNode, GoalNode);
-				//	}
-				//}
-
-				//////// Trying to figure out if we are about to collide
-				/* If enemy and player might collide
-					could check it simply by checking distance & direction (maybe "raycast" with the width of the tank)
-						either just try to turn and move around
-						or add the enemy's predicted path to the collision map? 
-							maybe just give it a bigger weighting so that if it blocks completly the robot can still find a path
-				*/
-				//double collisionRange = 100;
-				//enemyHeading = enemyData.Heading;
-				////if (enemyData.Distance < collisionRange)
-				//{
-				//	enemyHeading -= 180;
-				//	if (enemyHeading < 0)
-				//	{
-				//		enemyHeading += 360;
-				//	}
-				//	//collisionCourse = (enemyHeading.IsAngleNear(Heading, 35));
-				//	collisionCourse = Math.Abs(enemyData.Position.Dot(Position)) > 0.9;
-				//	// TODO Figure out if we are close to non-paralell? the opposite of 0 from the dot product when they are paralell
-				//	if (collisionCourse == true)
-				//	{
-				//		//Print("Collision course!");
-				//	}
-
-				//	//Print("Collision range");
-				//}
+				//EnemyAvoidance();
 
 				radarFSM.Update();
 				driverFSM.Update();
-				commanderFSM.Update();
 				Scan();
 				Execute();
 			}
@@ -254,7 +113,6 @@ namespace PG4500_2016_Exam2
 		{
 			radarFSM = new FiniteStateMachine("Radar", this);
 			driverFSM = new FiniteStateMachine("Driver", this);
-			commanderFSM = new FiniteStateMachine("Commander", this);
 			Position = new Vector2D();
 			Drawing = new Drawing(this);
 			collisionMap = new CollisionMap(this);
@@ -276,29 +134,46 @@ namespace PG4500_2016_Exam2
 				hasReachedStartPosition = true;
 			}
 
-			// Check if we have reached the targetnode, and if so pop a node from the path, and set that as the target
+
+			// TODO Add another check to see if we reached the targetnode or the targetposition
+			// then set the targetposition either to targetnode.position or between targnode and nexttargnode
+
+
+			// Check if we have reached the targetnode
 			bool reachedTargetNode = CurrentNode == TargetNode;
 			if (reachedTargetNode == false && TargetNode != null)
 			{
-				reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
+				//reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
+				reachedTargetNode = Position.Distance(TargetPosition) < TargetNodeDistance;
 			}
-			if (nodePath != null && nodePath.Count > 0)
+
+			// Set the targetnode as a node from the path 
+			if ((reachedTargetNode || TargetNode == null) // If we have reached the target node
+				&& nodePath != null && nodePath.Count > 0 && GoalNode != null) // If we have a path and a goal
 			{
-				if (GoalNode != null && (reachedTargetNode || TargetNode == null))
+				TargetNode = nodePath.Pop();
+				TargetPosition = TargetNode.PhysicalPosition;
+				if (nodePath.Count > 0)
 				{
-					if (nodePath != null && nodePath.Count > 0)
-					{
-						TargetNode = nodePath.Pop();
-						Out.WriteLine("New targetnode is: " + TargetNode);
-					}
+					NextTargetNode = nodePath.Peek();
+					TargetPosition = (TargetNode.PhysicalPosition + NextTargetNode.PhysicalPosition) * 0.5;
 				}
+				else
+				{
+					NextTargetNode = null;
+				}
+				Out.WriteLine("New targetnode is: " + TargetNode);
 			}
+
+			// If we have reached the goal
 			if (CurrentNode == GoalNode)
 			{
 				TargetNode = null;
+				TargetPosition = null;
+				NextTargetNode = null;
 				nodePath = null;
 				GoalNode = null;
-				Out.WriteLine("No new target");
+				Out.WriteLine("Reached goal of path!");
 			}
 
 			// Path to where the enemy stopped if we aren't already pathing
@@ -316,7 +191,154 @@ namespace PG4500_2016_Exam2
 			}
 		}
 
-	    private void SetGoalNode(MapNode goal)
+		private void EnemyAvoidance()
+		{
+			/* Here is my attempts at trying to avoid the enemy. I couldn't get a properly working implementation in time. */
+
+			//////// Trying to avoid the predicted
+			if (enemyData.PredictedNode != null)
+			{
+				if (nodePath.Contains(enemyData.PredictedNode))
+				{
+					Print("---------------- Path contains predicted ----------------");
+					// TODO Include neighbours of that node
+					if (prevLocked != null)
+					{
+						prevLocked.IsLocked = false;
+					}
+					enemyData.PredictedNode.IsLocked = true;
+					prevLocked = enemyData.PredictedNode;
+
+					nodePath = aStarSearch.Search(TargetNode, GoalNode);
+				}
+			}
+
+			//////// Slowing down/stopping
+			//if (enemyData.PredictedNode != null)
+			//{
+			//	if (enemyData.PredictedNode == TargetNode || (nodePath != null && nodePath.Contains(enemyData.PredictedNode)))
+			//	{
+			//		Print("----------------------- Predicted node is TargetNode or Path! -----------------------");
+			//		// TODO Slow down
+			//		CurrentSpeed = CollisionAvoidanceSpeed;
+			//		//resetStartTime = Time;
+			//	}
+			//	else if (resetStartTime == -1)
+			//	{
+			//		CurrentSpeed = MaxSpeed;
+			//	}
+			//}
+			//if (resetStartTime == -1 && enemyData.Distance < CollisionAvoidanceDistance)
+			//{
+			//	// TODO Stop
+			//	Print("----------------------- To close for comfort! -----------------------");
+			//	CurrentSpeed = 0.1;
+			//	resetStartTime = Time;
+			//}
+			//if (resetStartTime != -1)
+			//{
+			//	Print("Reset:" + resetStartTime + ", Time: " + Time);
+			//	if (Time - resetStartTime > CollisionAvoidanceDuration)
+			//	{
+			//		CurrentSpeed = MaxSpeed;
+			//		resetStartTime = -1;
+			//	}
+			//}
+
+			//////// Repathing and accounting for the enemy position
+			//if (enemyData.Distance < CollisionMap.NodeSize * 4)
+			//{
+			//	Print("Predicted moved");
+			//	if (enemyData.PrevNode != null)
+			//	{
+			//		enemyData.PrevNode.Weight = 0;
+			//		foreach (var node in enemyData.PrevNode.Neighbours)
+			//		{
+			//			node.Weight = 0;
+			//			foreach (var node2 in node.Neighbours)
+			//			{
+			//				node2.Weight = 0;
+			//			}
+			//		}
+			//	}
+			//	if (enemyData.CurrentNode != null)
+			//	{
+			//		const double enemyNodeWeight = 2;
+			//		enemyData.CurrentNode.Weight = enemyNodeWeight;
+			//		foreach (var node in enemyData.CurrentNode.Neighbours)
+			//		{
+			//			node.Weight = enemyNodeWeight;
+			//			foreach (var node2 in node.Neighbours)
+			//			{
+			//				node2.Weight = enemyNodeWeight;
+			//			}
+			//		}
+			//	}
+			//	if (GoalNode != null && TargetNode != null)
+			//	{
+			//		//SetGoalNode(GoalNode);
+			//		//TargetNode = null;
+			//		//nodePath = aStarSearch.Search(TargetNode, GoalNode);
+			//		//TargetNode = nodePath.Pop();
+			//	}
+			//}
+
+			//////// Repathing and accounting for the enemy predicted position (this moved through obstacles
+			//if (enemyData.PredictedNode != enemyData.PrevPredictedNode && enemyData.Distance < CollisionMap.NodeSize * 30)
+			//{
+			//	Print("Predicted moved");
+			//	if (enemyData.PrevPredictedNode != null)
+			//	{
+			//		enemyData.PrevPredictedNode.Weight = 0;
+			//		foreach (var node in enemyData.PrevPredictedNode.Neighbours)
+			//		{
+			//			node.Weight = 0;
+			//		}
+			//	}
+			//	if (enemyData.PredictedNode != null)
+			//	{
+			//		enemyData.PredictedNode.Weight = 10;
+			//		foreach (var node in enemyData.PredictedNode.Neighbours)
+			//		{
+			//			node.Weight = 10;
+			//		}
+			//	}
+			//	if (GoalNode != null)
+			//	{
+			//		//SetGoalNode(GoalNode);
+			//		nodePath = aStarSearch.Search(CurrentNode, GoalNode);
+			//	}
+			//}
+
+			//////// Trying to figure out if we are about to collide
+			/* If enemy and player might collide
+				could check it simply by checking distance & direction (maybe "raycast" with the width of the tank)
+					either just try to turn and move around
+					or add the enemy's predicted path to the collision map? 
+						maybe just give it a bigger weighting so that if it blocks completly the robot can still find a path
+			*/
+			//double collisionRange = 100;
+			//enemyHeading = enemyData.Heading;
+			////if (enemyData.Distance < collisionRange)
+			//{
+			//	enemyHeading -= 180;
+			//	if (enemyHeading < 0)
+			//	{
+			//		enemyHeading += 360;
+			//	}
+			//	//collisionCourse = (enemyHeading.IsAngleNear(Heading, 35));
+			//	collisionCourse = Math.Abs(enemyData.Position.Dot(Position)) > 0.9;
+			//	// TODO Figure out if we are close to non-paralell? the opposite of 0 from the dot product when they are paralell
+			//	if (collisionCourse == true)
+			//	{
+			//		//Print("Collision course!");
+			//	}
+
+			//	//Print("Collision range");
+			//}
+		}
+
+		private void SetGoalNode(MapNode goal)
 	    {
 		    if (goal == null)
 		    {
@@ -358,15 +380,6 @@ namespace PG4500_2016_Exam2
 		{
 			enemyData.SetData(evnt);
 			radarFSM.EnqueueState(StateManager.StateRadarLock);
-		}
-
-		public override void OnMouseMoved(MouseEvent e)
-		{
-			//MapNode node = collisionMap.GetNode(new Vector2D(e.X, e.Y), true);
-			//if (node != null)
-			//{
-			//	SetGoalNode(node);
-			//}
 		}
 
 		public override void OnMouseClicked(MouseEvent e)
@@ -433,8 +446,8 @@ namespace PG4500_2016_Exam2
 			//	}
 			//}
 
+			return;
 			Drawing.DrawString(Color.Black, "Driver: " + driverFSM.CurrentStateID, new Vector2D(0, -20));
-			Drawing.DrawString(Color.Black, "Commander: " + commanderFSM.CurrentStateID, new Vector2D(0, -40));
 			Drawing.DrawString(Color.Black, "Radar: " + radarFSM.CurrentStateID, new Vector2D(0, -60));
 			Drawing.DrawString(Color.Black, "CurrentNode: " + ((CurrentNode == null) ? "null" : CurrentNode.ToString()), new Vector2D(0, -80));
 			Drawing.DrawString(Color.Black, "TargetNode: " + ((TargetNode == null) ? "null" : TargetNode.ToString()), new Vector2D(0, -100));
