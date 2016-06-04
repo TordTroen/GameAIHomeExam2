@@ -15,7 +15,7 @@ namespace PG4500_2016_Exam2
 	{
 		public const double Mass = 1;
 		public const double MaxSpeed = 8;
-		private const double TargetNodeDistance = 30;
+		private const double TargetNodeDistance = 50;
 
 		public const long CollisionAvoidanceDuration = 16; // Turns before we continue the normal movement
 		public const double CollisionAvoidanceDistance = CollisionMap.NodeSize * 4; // Distance to the enemy where we stop for a while
@@ -140,33 +140,42 @@ namespace PG4500_2016_Exam2
 
 
 			// Check if we have reached the targetnode
-			bool reachedTargetNode = CurrentNode == TargetNode;
-			if (reachedTargetNode == false && TargetNode != null)
+			bool reachedTargetPos = false;//CurrentNode == TargetNode;
+			//if (reachedTargetNode == false && TargetNode != null)
+			if (TargetPosition != null)
 			{
 				//reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
-				reachedTargetNode = Position.Distance(TargetPosition) < TargetNodeDistance;
+				reachedTargetPos = Position.Distance(TargetPosition) < TargetNodeDistance;
+				targetPosIsNode = !targetPosIsNode;
 			}
 
 			// Set the targetnode as a node from the path 
-			if ((reachedTargetNode || TargetNode == null) // If we have reached the target node
+			if ((reachedTargetPos || TargetNode == null) // If we have reached the target node
 				&& nodePath != null && nodePath.Count > 0 && GoalNode != null) // If we have a path and a goal
 			{
-				TargetNode = nodePath.Pop();
-				TargetPosition = TargetNode.PhysicalPosition;
-				if (nodePath.Count > 0)
+				if (targetPosIsNode)
 				{
-					NextTargetNode = nodePath.Peek();
-					TargetPosition = (TargetNode.PhysicalPosition + NextTargetNode.PhysicalPosition) * 0.5;
+					TargetNode = nodePath.Pop();
+					if (nodePath.Count > 0)
+					{
+						NextTargetNode = nodePath.Peek();
+						TargetPosition = (TargetNode.PhysicalPosition + NextTargetNode.PhysicalPosition)*0.5;
+					}
+					else
+					{
+						NextTargetNode = null;
+					}
+					Out.WriteLine("New targetpos is: " + TargetPosition);
 				}
 				else
 				{
-					NextTargetNode = null;
+					TargetPosition = TargetNode.PhysicalPosition;
+					Out.WriteLine("New targetnode is: " + TargetNode);
 				}
-				Out.WriteLine("New targetnode is: " + TargetNode);
 			}
 
 			// If we have reached the goal
-			if (CurrentNode == GoalNode)
+			if (reachedTargetPos && TargetNode == GoalNode)
 			{
 				TargetNode = null;
 				TargetPosition = null;
@@ -405,10 +414,10 @@ namespace PG4500_2016_Exam2
 
 		public override void OnPaint(IGraphics graphics)
 		{
-			if (CurrentNode != null)
-			{
-				Drawing.DrawBox(Color.Blue, CurrentNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
-			}
+			//if (CurrentNode != null)
+			//{
+			//	Drawing.DrawBox(Color.Blue, CurrentNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+			//}
 			if (GoalNode != null)
 			{
 				Drawing.DrawBox(Color.Green, GoalNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
@@ -416,7 +425,7 @@ namespace PG4500_2016_Exam2
 
 			if (TargetNode != null)
 			{
-				Drawing.DrawBox(Color.Pink, TargetNode.PhysicalPosition, 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				Drawing.DrawBox(Color.Pink, TargetNode.PhysicalPosition, 20, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 
 			if (enemyData != null && enemyData.PredictedNode != null)
@@ -430,7 +439,7 @@ namespace PG4500_2016_Exam2
 				{
 					//if (node == startNode || node == goalNode) continue;
 
-					Drawing.DrawBox(Color.White, node.PhysicalPosition, 50, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+					Drawing.DrawBox(Color.White, node.PhysicalPosition, 20, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 				}
 			}
 
