@@ -22,6 +22,7 @@ namespace HomeExam
 		{
 			var open = new List<MapNode>(); // TODO Replace with a min-heap or something similar
 
+			// Initialize the nodes
 			foreach (var node in collisionMap.map)
 			{
 				node.Parent = null;
@@ -29,6 +30,7 @@ namespace HomeExam
 				node.G = double.MaxValue;
 				node.IsClosed = false;
 			}
+			// Initialize the startingnode and the openset
 			start.G = 0;
 			start.H = 0;
 			start.F = 0;
@@ -58,18 +60,10 @@ namespace HomeExam
 
 					neighbour.H = Heuristic(neighbour, goal);
 					var newCost = (1 + neighbour.Weight) * (current.G + neighbour.H);
-					//var heur = Heuristic(current, neighbour);
-					//var newCost = (1 + neighbour.Weight) * (current.G + heur);
-					
-					//robot.Print(start + " to " + neighbour + " cost: " + newCost);
-					
-					//neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
 
 					neighbour.F = neighbour.G + neighbour.H;
 					if (newCost < neighbour.G)
 					{
-						//robot.Print("Newg is more than old");
-						//continue;
 						open.Add(neighbour);
 						neighbour.G = newCost;
 					}

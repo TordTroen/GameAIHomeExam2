@@ -21,23 +21,9 @@ namespace HomeExam.States
 		{
 			string ret = base.OnUpdate();
 
-			//seek.Steer(robot.TargetNode.PhysicalPosition);
 			if (robot.TargetPosition != null)
 			{
-				//Vector2D targetPosition = robot.TargetNode.PhysicalPosition;
-				//if (robot.NextTargetNode != null)
-				//{
-				//	targetPosition = (robot.TargetNode.PhysicalPosition + robot.NextTargetNode.PhysicalPosition) * 0.5;
-				//}
-				//seek.Steer(targetPosition);
 				seek.Steer(robot.TargetPosition);
-
-				//Vector2D targetPos = robot.TargetNode.PhysicalPosition;
-
-				//double angle = Vector2D.RotationAngleFromVectors(robot.Position, targetPos, robot.Heading);
-
-				//robot.SetAhead(4);
-				//robot.SetTurnRight(angle * 1000);
 			}
 
 			return ret;
