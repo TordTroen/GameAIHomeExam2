@@ -55,6 +55,8 @@ namespace HomeExam
 		public CollisionMap(Trotor14MechaGodzilla robot)
 		{
 			this.robot = robot;
+			Map = new List<MapNode>();
+			Obstacles = new List<MapNode>();
 			InitializeMap();
 		}
 
@@ -70,7 +72,6 @@ namespace HomeExam
 					y--;
 					x = 0;
 				}
-
 				// Create a new node with the current x and y
 				MapNode node = new MapNode(x, y);
 				if (node.IsInsideMapBounds())
@@ -89,7 +90,7 @@ namespace HomeExam
 						node.Weight = 0;
 					}
 				}
-				
+
 				x++;
 			}
 

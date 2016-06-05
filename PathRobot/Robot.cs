@@ -415,7 +415,7 @@ namespace PG4500_2016_Exam2
 			{
 				foreach (var node in nodePath)
 				{
-					Drawing.DrawBox(Color.White, node.Position, 20, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+					Drawing.DrawBox(Color.White, node.Position, 50, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 				}
 			}
 
