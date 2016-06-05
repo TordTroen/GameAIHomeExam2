@@ -86,6 +86,7 @@ namespace PG4500_2016_Exam2
 			//Out.WriteLine("======================");
 
 			UpdateBot();
+			ResetPathInfo();
 
 			// Initially start going to [25, 25]
 			startingNode = collisionMap.GetNode(new Vector2D(25, 25), false);
@@ -129,24 +130,17 @@ namespace PG4500_2016_Exam2
 		private void FollowPath()
 		{
 			// Check if we have reached the initial starting position
-			if (!hasReachedStartPosition && Position.Distance(startingNode.PhysicalPosition) < TargetNodeDistance)
+			if (!hasReachedStartPosition && Position.Distance(startingNode.Position) < TargetNodeDistance)
 			{
 				hasReachedStartPosition = true;
 			}
-
-
-			// TODO Add another check to see if we reached the targetnode or the targetposition
-			// then set the targetposition either to targetnode.position or between targnode and nexttargnode
-
 
 			// Check if we have reached the targetnode
 			bool reachedTargetPos = false;//CurrentNode == TargetNode;
 			//if (reachedTargetNode == false && TargetNode != null)
 			if (TargetPosition != null)
 			{
-				//reachedTargetNode = Position.Distance(TargetNode.PhysicalPosition) < TargetNodeDistance;
 				reachedTargetPos = Position.Distance(TargetPosition) < TargetNodeDistance;
-				targetPosIsNode = !targetPosIsNode;
 			}
 
 			// Set the targetnode as a node from the path 
@@ -156,32 +150,30 @@ namespace PG4500_2016_Exam2
 				if (targetPosIsNode)
 				{
 					TargetNode = nodePath.Pop();
-					if (nodePath.Count > 0)
+					if (nodePath.Count > 0)// && NextTargetNode != null && TargetNode != null)
 					{
 						NextTargetNode = nodePath.Peek();
-						TargetPosition = (TargetNode.PhysicalPosition + NextTargetNode.PhysicalPosition)*0.5;
+						TargetPosition = (TargetNode.Position + NextTargetNode.Position)*0.5;
 					}
 					else
 					{
+						TargetPosition = TargetNode.Position;
 						NextTargetNode = null;
 					}
 					Out.WriteLine("New targetpos is: " + TargetPosition);
 				}
-				else
+				else if (TargetNode != null)
 				{
-					TargetPosition = TargetNode.PhysicalPosition;
-					Out.WriteLine("New targetnode is: " + TargetNode);
+					TargetPosition = NextTargetNode.Position;
+					Out.WriteLine("New targetnode is: " + TargetNode + ": " + TargetPosition);
 				}
+				targetPosIsNode = !targetPosIsNode;
 			}
 
 			// If we have reached the goal
-			if (reachedTargetPos && TargetNode == GoalNode)
+			if (CurrentNode == GoalNode)
 			{
-				TargetNode = null;
-				TargetPosition = null;
-				NextTargetNode = null;
-				nodePath = null;
-				GoalNode = null;
+				ResetPathInfo();
 				Out.WriteLine("Reached goal of path!");
 			}
 
@@ -198,6 +190,16 @@ namespace PG4500_2016_Exam2
 				driverFSM.EnqueueState(StateManager.StateTurnToTarget);
 				hasReachedFirstNodeInPath = true;
 			}
+		}
+
+		private void ResetPathInfo()
+		{
+			TargetNode = null;
+			TargetPosition = null;
+			NextTargetNode = null;
+			nodePath = null;
+			GoalNode = null;
+			targetPosIsNode = true;
 		}
 
 		private void EnemyAvoidance()
@@ -400,13 +402,11 @@ namespace PG4500_2016_Exam2
 				// Right click to set goalnode
 				if (e.Button == 1 && GoalNode != null)
 				{
-					//CurrentNode = node;
 					TargetNode = null;
 					nodePath = aStarSearch.Search(node, GoalNode);
 				}
 				else if (e.Button == 3)
 				{
-					//goalNode = node;
 					SetGoalNode(node);
 				}
 			}
@@ -414,61 +414,47 @@ namespace PG4500_2016_Exam2
 
 		public override void OnPaint(IGraphics graphics)
 		{
-			//if (CurrentNode != null)
-			//{
-			//	Drawing.DrawBox(Color.Blue, CurrentNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
-			//}
+			if (TargetPosition != null)
+			{
+				Drawing.DrawBox(Color.Red, TargetPosition, 150, 20, 20);
+			}
+
 			if (GoalNode != null)
 			{
-				Drawing.DrawBox(Color.Green, GoalNode.PhysicalPosition, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				Drawing.DrawBox(Color.Green, GoalNode.Position, 120, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 
 			if (TargetNode != null)
 			{
-				Drawing.DrawBox(Color.Pink, TargetNode.PhysicalPosition, 20, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				Drawing.DrawBox(Color.Pink, TargetNode.Position, 20, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 
 			if (enemyData != null && enemyData.PredictedNode != null)
 			{
-				Drawing.DrawBox(Color.Yellow, enemyData.PredictedNode.PhysicalPosition, 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+				Drawing.DrawBox(Color.Yellow, enemyData.PredictedNode.Position, 127, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 			}
 
 			if (nodePath != null)
 			{
 				foreach (var node in nodePath)
 				{
-					//if (node == startNode || node == goalNode) continue;
-
-					Drawing.DrawBox(Color.White, node.PhysicalPosition, 20, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+					Drawing.DrawBox(Color.White, node.Position, 20, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
 				}
 			}
 
-			// Paint the enemy
-			//if (enemyData.CurrentNode != null)
-			//{
-			//	Drawing.DrawBox(Color.Red, enemyData.CurrentNode.PhysicalPosition, 50, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
+			//Drawing.DrawString(Color.Black, "Driver: " + driverFSM.CurrentStateID, new Vector2D(0, -20));
+			//Drawing.DrawString(Color.Black, "Radar: " + radarFSM.CurrentStateID, new Vector2D(0, -40));
+			//Drawing.DrawString(Color.Black, "CurrentNode: " + ((CurrentNode == null) ? "null" : CurrentNode.ToString()), new Vector2D(0, -60));
+			//Drawing.DrawString(Color.Black, "TargetNode: " + ((TargetNode == null) ? "null" : TargetNode.ToString()), new Vector2D(0, -80));
+			//Drawing.DrawString(Color.Black, "GoalNode: " + ((GoalNode == null) ? "null" : GoalNode.ToString()), new Vector2D(0, -100));
+			//Drawing.DrawString(Color.Black, "NodePath: " + ((nodePath == null) ? "null" : nodePath.Count.ToString()), new Vector2D(0, -120));
 
-			//	// Paint the neighbours
-			//	foreach (var node in enemyData.CurrentNode.Neighbours)
-			//	{
-			//		Drawing.DrawBox(Color.Orange, node.PhysicalPosition, 40, (float)CollisionMap.NodeSize, (float)CollisionMap.NodeSize);
-			//	}
-			//}
-
-			return;
-			Drawing.DrawString(Color.Black, "Driver: " + driverFSM.CurrentStateID, new Vector2D(0, -20));
-			Drawing.DrawString(Color.Black, "Radar: " + radarFSM.CurrentStateID, new Vector2D(0, -60));
-			Drawing.DrawString(Color.Black, "CurrentNode: " + ((CurrentNode == null) ? "null" : CurrentNode.ToString()), new Vector2D(0, -80));
-			Drawing.DrawString(Color.Black, "TargetNode: " + ((TargetNode == null) ? "null" : TargetNode.ToString()), new Vector2D(0, -100));
-			Drawing.DrawString(Color.Black, "GoalNode: " + ((GoalNode == null) ? "null" : GoalNode.ToString()), new Vector2D(0, -120));
-			Drawing.DrawString(Color.Black, "NodePath: " + ((nodePath == null) ? "null" : nodePath.Count.ToString()), new Vector2D(0, -140));
-
-			Drawing.DrawString(Color.Black, "Heading: " + Heading, new Vector2D(200, -20));
-			Drawing.DrawString(Color.Black, "RealEnemyHeading: " + enemyData.Heading, new Vector2D(200, -40));
-			Drawing.DrawString(Color.Black, "CalcEnemyHeading: " + enemyHeading, new Vector2D(200, -60));
-			Drawing.DrawString(Color.Black, "CollisionCourse: " + collisionCourse, new Vector2D(200, -80));
-			Drawing.DrawString(Color.Black, "Distance: " + enemyData.Distance, new Vector2D(200, -100));
-			Drawing.DrawString(Color.Black, "Speed: " + CurrentSpeed, new Vector2D(200, -120));
+			//Drawing.DrawString(Color.Black, "Heading: " + Heading, new Vector2D(200, -20));
+			//Drawing.DrawString(Color.Black, "RealEnemyHeading: " + enemyData.Heading, new Vector2D(200, -40));
+			//Drawing.DrawString(Color.Black, "CalcEnemyHeading: " + enemyHeading, new Vector2D(200, -60));
+			//Drawing.DrawString(Color.Black, "CollisionCourse: " + collisionCourse, new Vector2D(200, -80));
+			//Drawing.DrawString(Color.Black, "Distance: " + enemyData.Distance, new Vector2D(200, -100));
+			//Drawing.DrawString(Color.Black, "Speed: " + CurrentSpeed, new Vector2D(200, -120));
 		}
 	}
 }

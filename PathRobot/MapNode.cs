@@ -16,7 +16,7 @@ namespace HomeExam
 		/// A list of all the neighbours of this node (obstacle nodes are excluded)
 		/// </summary>
 		public List<MapNode> Neighbours { get; set; }
-		public Vector2D PhysicalPosition { get; private set; }
+		public Vector2D Position { get; private set; }
 
 		public double G { get; set; }
 		public double H { get; set; }
@@ -31,7 +31,7 @@ namespace HomeExam
 			Neighbours = new List<MapNode>();
 			X = x;
 			Y = y;
-			PhysicalPosition = new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize / 2, CollisionMap.NodeSize / 2);
+			Position = new Vector2D(X * CollisionMap.NodeSize, Y * CollisionMap.NodeSize) + new Vector2D(CollisionMap.NodeSize / 2, CollisionMap.NodeSize / 2);
 		}
 
 		public bool IsInsideMapBounds()

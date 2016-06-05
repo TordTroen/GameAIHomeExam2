@@ -15,7 +15,7 @@ namespace HomeExam.States
 			double angle = 0;
 			if (robot.TargetNode != null)
 			{
-				angle = Vector2D.RotationAngleFromVectors(robot.Position, robot.TargetNode.PhysicalPosition, robot.Heading);
+				angle = Vector2D.RotationAngleFromVectors(robot.Position, robot.TargetNode.Position, robot.Heading);
 				robot.SetTurnRight(angle);
 			}
 

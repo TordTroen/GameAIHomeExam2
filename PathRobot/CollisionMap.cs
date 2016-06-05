@@ -173,7 +173,7 @@ namespace HomeExam
 		{
 			foreach (var node in map)
 			{
-				Vector2D pos = node.PhysicalPosition;
+				Vector2D pos = node.Position;
 				robot.Drawing.DrawBox(Color.Yellow, pos, 127);
 			}
 		}

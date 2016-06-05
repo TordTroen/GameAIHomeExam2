@@ -60,7 +60,9 @@ namespace HomeExam
 					var newCost = (1 + neighbour.Weight) * (current.G + neighbour.H);
 					//var heur = Heuristic(current, neighbour);
 					//var newCost = (1 + neighbour.Weight) * (current.G + heur);
-					robot.Print(start + " to " + neighbour + " cost: " + newCost);
+					
+					//robot.Print(start + " to " + neighbour + " cost: " + newCost);
+					
 					//neighbour.H = goal.PhysicalPosition.Distance(neighbour.PhysicalPosition);
 
 					neighbour.F = neighbour.G + neighbour.H;
@@ -81,7 +83,7 @@ namespace HomeExam
 
 		public double Heuristic(MapNode from, MapNode to)
 		{
-			return from.PhysicalPosition.Distance(to.PhysicalPosition);
+			return from.Position.Distance(to.Position);
 		}
 
 		private Stack<MapNode> ReconstructPath(MapNode goal)

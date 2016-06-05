@@ -81,7 +81,7 @@ namespace HomeExam.States
 				transitionText += curState.Id;
 			}
 
-			robot.Out.WriteLine(transitionText);
+			//robot.Out.WriteLine(transitionText);
 		}
 	}
 }
