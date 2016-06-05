@@ -21,6 +21,7 @@ namespace HomeExam.States
 		{
 			string ret = base.OnUpdate();
 
+			// Simply use the steer behavior to move towards the robot's targetposition
 			if (robot.TargetPosition != null)
 			{
 				seek.Steer(robot.TargetPosition);

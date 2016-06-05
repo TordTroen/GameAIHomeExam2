@@ -10,7 +10,7 @@ namespace HomeExam.States
 	{
 		public override void OnEnter()
 		{
-			robot.SetTurnRadarRight(1000);
+			robot.SetTurnRadarRight(double.MaxValue);
 		}
 	}
 }

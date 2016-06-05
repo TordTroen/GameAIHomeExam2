@@ -23,6 +23,7 @@ namespace HomeExam.States
 		{
 			string ret = base.OnUpdate();
 
+			// Start the Radar sweep state if the enemydata is invalid (hasn't been updated in a while)
 			if (!robot.enemyData.ValidData())
 			{
 				ret = StateManager.StateRadarSweep;

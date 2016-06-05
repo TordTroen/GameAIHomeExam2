@@ -23,7 +23,7 @@ namespace HomeExam
 			var open = new List<MapNode>(); // TODO Replace with a min-heap or something similar
 
 			// Initialize the nodes
-			foreach (var node in collisionMap.map)
+			foreach (var node in collisionMap.Map)
 			{
 				node.Parent = null;
 				node.H = double.MaxValue;
@@ -51,7 +51,7 @@ namespace HomeExam
 				foreach (var neighbour in current.Neighbours)
 				{
 					// Skip this neighbour if the parent is already set or the neibour has already been processed 
-					if (neighbour.Parent != null || neighbour.IsClosed || neighbour.IsLocked)
+					if (neighbour.Parent != null || neighbour.IsClosed)
 					{
 						continue;
 					}
@@ -94,6 +94,7 @@ namespace HomeExam
 
 		private MapNode GetNodeWithLowestF(List<MapNode> list)
 		{
+			// This could be removed in favour of a different datastructure, so we don't have to do this linearily
 			int best = 0;
 
 			for (int i = 0; i < list.Count; i ++)

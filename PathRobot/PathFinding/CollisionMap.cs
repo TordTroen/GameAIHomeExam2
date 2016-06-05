@@ -15,11 +15,11 @@ namespace HomeExam
 		public const double NodeSize = 50; // The size of each node or cell
 		public const int Width = 16; // Number of nodes across
 		public const int Height = 12; // Number of nodes down
-		private const double WallNodeWeight = double.MaxValue; // The weight of a wall node, hould be really high so we don't pass them. (shouldn't matter as those nodes aren't included in the search.
+		private const double WallNodeWeight = double.MaxValue; // The weight of a wall node, should be really high so we don't pass them. (shouldn't matter as those nodes aren't included in the search.
 
 		// TODO Could store the nodes in a dictionary with x,y as key for faster lookup
-		public List<MapNode> map = new List<MapNode>(); // The nodes we can move through
-		public List<MapNode> obstacles = new List<MapNode>(); // The nodes we can't move through
+		public List<MapNode> Map { get; private set; } // The nodes we can move through
+		public List<MapNode> Obstacles { get; private set; } // The nodes we can't move through
 
 		// The collision map we have been provided
 		private readonly int[] rawMap =
@@ -79,18 +79,14 @@ namespace HomeExam
 					// Add the node to the map or the obstacles list based on what the simplemap value is
 					if (rawNode == 1)
 					{
-						obstacles.Add(node);
+						Obstacles.Add(node);
 						//map.Add(node);
 						node.Weight = WallNodeWeight;
 					}
 					else
 					{
-						map.Add(node);
+						Map.Add(node);
 						node.Weight = 0;
-						//if (rawNode == 2)
-						//{
-						//	node.Weight = 50;
-						//}
 					}
 				}
 				
@@ -98,11 +94,11 @@ namespace HomeExam
 			}
 
 			// Find and store the neighbours of all the nodes in both the map and obstacles list
-			foreach (var node in map)
+			foreach (var node in Map)
 			{
 				node.Neighbours = GetNeighbours(node);
 			}
-			foreach (var node in obstacles)
+			foreach (var node in Obstacles)
 			{
 				node.Neighbours = GetNeighbours(node);
 			}
@@ -128,7 +124,7 @@ namespace HomeExam
 			if (comp.IsInsideMapBounds())
 			{
 				// Try to find a matching node in the map
-				foreach (var node in map)
+				foreach (var node in Map)
 				{
 					if (node == comp)
 					{
@@ -141,7 +137,7 @@ namespace HomeExam
 				if (n == null && includeObstacles)
 				{
 					// Try to find a matching node in the list of obstacles
-					foreach (var node in obstacles)
+					foreach (var node in Obstacles)
 					{
 						if (node == comp)
 						{
@@ -167,15 +163,6 @@ namespace HomeExam
 				}
 			}
 			return neighbours;
-		}
-
-		public void PaintMap()
-		{
-			foreach (var node in map)
-			{
-				Vector2D pos = node.Position;
-				robot.Drawing.DrawBox(Color.Yellow, pos, 127);
-			}
 		}
 	}
 }
